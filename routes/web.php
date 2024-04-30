@@ -32,7 +32,7 @@ Route::get('/logmeout', function (Request $request) {
 
 Auth::routes();
 Route::get('/main', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->withoutMiddleware('auth')->middleware('auth:customer');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->withoutMiddleware('auth')->middleware('auth:customer');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])->name('userTable');
 Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable');
 // Route::get('/permissions', [App\Http\Controllers\HomeController::class, 'permTable'])->name('user.perm');

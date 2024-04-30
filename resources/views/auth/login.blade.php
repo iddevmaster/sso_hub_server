@@ -40,6 +40,9 @@
                                 <button type="submit" class="btn w-100" id="submitbtn">
                                     เข้าสู่ระบบ
                                 </button>
+                                <p type="submit" class="w-100 my-1">
+                                    หรือ <a href="/customer-login">เข้าสู่ระบบด้วยบัญชีทั่วไป</a>
+                                </p>
                             </div>
                         </form>
                     </div>
