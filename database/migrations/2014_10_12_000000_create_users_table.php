@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('icon')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

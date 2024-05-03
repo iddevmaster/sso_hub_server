@@ -43,10 +43,6 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-        'auth:any' => [
-            'auth',
-            'auth:customer',
-        ],
     ];
 
     /**
@@ -70,6 +66,5 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'scopes' => \Laravel\Passport\Http\Middleware\CheckScopes::class,
         'scope' => \Laravel\Passport\Http\Middleware\CheckForAnyScope::class,
-        'auth:customer' => \App\Http\Middleware\AuthenticateCustomer::class,
     ];
 }

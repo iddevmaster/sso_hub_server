@@ -54,9 +54,9 @@
                             <tbody>
                                 @foreach ($customers as $index => $user)
                                     <tr>
-                                        <th class="text-start">{{ $user->citizen_id }}</th>
-                                        <td>{{ $user->full_name }}</td>
-                                        <td class="text-start">{{ is_array($user->brn) ? $user->brn[0] : ''}}</td>
+                                        <th class="text-start">{{ $user->email }}</th>
+                                        <td>{{ $user->name }}</td>
+                                        <td class="text-start">{{ $user->brn }}</td>
                                         <td>{{ $user->course }}</td>
                                         <td >
                                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#userdetail{{ $index }}" data-toggle="tooltip" title="Detail"><i class="bi bi-person-vcard"></i></button>
@@ -70,22 +70,22 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="row row-cols-2 text-wrap">
-                                                            <div class="col"><b>Citizen ID:</b> {{ $user->citizen_id }}</div>
-                                                            <div class="col"><b>Name:</b> {{ $user->full_name }}</div>
+                                                            <div class="col"><b>Citizen ID:</b> {{ $user->email }}</div>
+                                                            <div class="col"><b>Name:</b> {{ $user->name }}</div>
                                                             <div class="col"><b>Gender:</b> {{ $user->gender }}</div>
                                                             <div class="col"><b>Address:</b> {{ $user->address }}</div>
                                                             <div class="col"><b>Province:</b> {{ $user->province }}</div>
                                                             <div class="col"><b>DoB:</b> {{ $user->dob }}</div>
                                                             <div class="col"><b>Phone:</b> {{ $user->phone }}</div>
                                                             <div class="col"><b>Course:</b> {{ $user->course }}</div>
-                                                            <div class="col-12"><b>Branch: </b> {{ is_array($user->brn) ? $user->brn[0] . ' / ' . $user->brn[1] : ''}}</div>
+                                                            <div class="col-12"><b>Branch: </b> {{ $user->brn . ' / ' . $user->agn}}</div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 </div>
                                             </div>
                                             <button class="btn btn-sm btn-warning editBtn" custom="{{ $user }}" data-toggle="tooltip" title="Edit"><i class="bi bi-gear"></i></button>
-                                            <button class="btn btn-sm btn-danger delBtn" value="{{ $user->citizen_id }}" data-toggle="tooltip" title="Delete"><i class="bi bi-trash3"></i></button>
+                                            <button class="btn btn-sm btn-danger delBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Delete"><i class="bi bi-trash3"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -195,8 +195,8 @@
                             data: {data:JSON.stringify(chunk)},
                             success: function(response) {
                                 if (!response.success) { // Adjust success check based on your API's response format
-                                    $('#excel_data').html('<div class="alert alert-danger w-100" role="alert"><i class="bi bi-x-circle"></i> Upload data unsuccess!</div>');
                                     console.error('API request failed: ', response); // Adjust error handling
+                                    $('#excel_data').html('<div class="alert alert-danger w-100" role="alert"><i class="bi bi-x-circle"></i> Upload data unsuccess!</div>');
                                 } else {
                                     console.log(`Successfully sent chunk ${i / 100 + 1}: `, response);
                                 }
@@ -274,7 +274,7 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
+                                data: { citizen_id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
                                 success: function (response) {
                                     console.log(response);
                                     Swal.fire({
@@ -314,13 +314,13 @@
                     title: 'Edit Customer',
                     html: `
                     <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="13" value="${custom.citizen_id}" id="cid" placeholder="* Citizen ID (1-13 digits)">
+                            <input type="text" class="form-control" maxlength="13" value="${custom.email}" id="cid" placeholder="* Citizen ID (1-13 digits)">
                         </div>
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="13" id="pass" placeholder="Password (8-13 digits) หากใช้รหัสผ่านเดิมไม่ต้องกรอก">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${custom.full_name}" id="name" placeholder="* Name">
+                            <input type="text" class="form-control" maxlength="100" value="${custom.name}" id="name" placeholder="* Name">
                         </div>
                         <select class="form-select mb-3" aria-label="selectCourse" id="gend">
                             <option value="" selected disabled>Select Gender</option>
@@ -329,16 +329,16 @@
                             <option value="เพศทางเลือก" ${custom.gender == 'เพศทางเลือก' ? 'selected' : ''}>เพศทางเลือก</option>
                         </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${custom.address}" id="addr" placeholder="Address">
+                            <input type="text" class="form-control" maxlength="100" value="${custom.address ?? ''}" id="addr" placeholder="Address">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${custom.province}" id="prov" placeholder="Province">
+                            <input type="text" class="form-control" maxlength="100" value="${custom.province ?? ''}" id="prov" placeholder="Province">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="dob" value="${custom.dob}" placeholder="Date of Birth">
+                            <input type="text" class="form-control" maxlength="100" id="dob" value="${custom.dob ?? ''}" placeholder="Date of Birth">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="phone" value="${custom.phone}" placeholder="Phone">
+                            <input type="text" class="form-control" maxlength="100" id="phone" value="${custom.phone ?? ''}" placeholder="Phone">
                         </div>
                         <select class="form-select" aria-label="selectCourse" id="course">
                             <option value="" selected disabled>* Select course</option>
@@ -367,7 +367,7 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { oid:custom.citizen_id, id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
+                                data: { oid:custom.id, id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
                                 success: function (response) {
                                     console.log(response);
                                     Swal.fire({

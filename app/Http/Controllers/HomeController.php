@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Agency;
 use App\Models\Branch;
-use App\Models\Customer;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -187,7 +186,7 @@ class HomeController extends Controller
     }
 
     public function customerTable() {
-        $customers = Customer::orderBy('created_at', 'desc')->get();
+        $customers = User::role('customer')->orderBy('id', 'desc')->get();
         return view('pages.customer-table', compact('customers'));
     }
 

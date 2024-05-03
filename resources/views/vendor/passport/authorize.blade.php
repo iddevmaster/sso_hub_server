@@ -57,11 +57,10 @@
                 <div class="d-flex justify-content-center align-items-center w-100 h-100">
                     <div class="card shadow w-md-25">
                         <div class="card-body">
-                            <div class="text-center py-3">
+                            <div class="text-center py-2">
                                 <img src="/imgs/logo.png" width="100" alt="">
-                                <h1 class="m-0 fw-bold"><span style="color: #F15A29">ID</span> Drives</h1>
-                                <p class="mb-0"><span class="fw-bold" style="color: #F15A29">One</span> account for <span class="fw-bold"
-                                        style="color: #F15A29">all</span> apps.</p>
+                                <h1 class="m-0 fw-bold">Smart <span style="color: #F15A29">HUB</span></h1>
+                                <p><span class="fw-bold" style="color: #F15A29">Training</span>zenter</p>
                             </div>
                             <div class="mb-3 text-center">
                                 <p class="fs-4">ลงทะเบียนด้วยชื่อผู้ใช้</p>
@@ -79,7 +78,7 @@
                                             </div>
                                             <div class="">
                                                 <h5 class="mb-0">{{ auth()->user()->name }}</h5>
-                                                <p class="mb-0" style="max-width: 200px;">ฝ่าย: {{ optional(auth()->user()->getDpm)->name }} สาขา: {{ optional(auth()->user()->getBrn)->name }}</p>
+                                                <p class="mb-0" style="max-width: 200px;">สาขา: {{ auth()->user()->brn }}</p>
                                             </div>
                                         </div>
                                     </button>
@@ -100,7 +99,7 @@
                             </div>
                             <div class="d-flex justify-content-center" id="copyright">
                                 <i class="bi bi-c-circle"> </i>
-                                <p class="m-0">{{ now()->format('Y') }} iddrives .co.ltd</p>
+                                <p class="m-0">{{ now()->format('Y') }} iddrives.co.ltd</p>
                             </div>
                         </div>
                     </div>

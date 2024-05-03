@@ -3,82 +3,82 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
-use App\Models\Customer;
+use App\Models\User as Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
-    public function customerAuth(Request $request) : RedirectResponse
-    {
-        $credentials = $request->validate([
-            'citizen_id' => ['required'],
-            'password' => ['required'],
-        ]);
+    // public function customerAuth(Request $request) : RedirectResponse
+    // {
+    //     $credentials = $request->validate([
+    //         'citizen_id' => ['required'],
+    //         'password' => ['required'],
+    //     ]);
 
-        if (Auth::guard('customer')->attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect('/');
-        }
+    //     if (Auth::guard('customer')->attempt($credentials)) {
+    //         $request->session()->regenerate();
+    //         return redirect('/');
+    //     }
 
-        return back()->withErrors([
-            'loginError' => 'Citizen ID or Password does not match.',
-        ]);
-    }
+    //     return back()->withErrors([
+    //         'loginError' => 'Citizen ID or Password does not match.',
+    //     ]);
+    // }
 
     public function storeCustomer(Request $request) {
         $request->validate([
-            'id' => 'required|unique:customers,citizen_id|max:13',
+            'citizen_id' => 'required|unique:users,email|max:255',
             'name' => 'required|max:255',
             'pass' => 'required|max:13|min:8',
             'course' => 'required',
         ], [
-            'id.max' => 'Citizen ID must be 1-13 character.',
+            'citizen_id.max' => 'Citizen ID must be 1-13 character.',
             'pass.max' => 'Password must be 8-13 character.',
             'pass.min' => 'Password must be 8-13 character.',
         ]);
         $cust = Customer::create([
-            'citizen_id' => $request->id,
+            'email' => $request->citizen_id,
             'password' => Hash::make($request->pass),
-            'full_name' => $request->name,
-            'gender' => $request->gend ?? '-Unknow-',
-            'address' => $request->addr ?? '-Unknow-',
-            'province' => $request->prov ?? '-Unknow-',
-            'dob' => $request->dob ?? '-Unknow-',
-            'phone' => $request->phone ?? '-Unknow-',
+            'name' => $request->name,
+            'gender' => $request->gend,
+            'address' => $request->addr,
+            'province' => $request->prov,
+            'dob' => $request->dob,
+            'phone' => $request->phone,
             'course' => $request->course,
             'staff' => $request->user()->id,
-            'brn' => $request->user()->brn
+            'brn' => $request->user()->getBrn->name,
+            'agn' => $request->user()->getAgn->name,
+            'role' => 'customer'
         ]);
+
+        $cust->assignRole('customer');
+
         return response()->json(['message' => $request->all()]);
     }
 
     public function updateCustomer(Request $request) {
         $request->validate([
-            'id' => 'required|max:13',
+            'id' => 'required',
             'name' => 'required|max:255',
-        ], [
-            'id.max' => 'Citizen ID must be 1-13 character.',
         ]);
 
         $cust = Customer::find($request->oid);
         $cust->update([
-            'citizen_id' => $request->id,
-            'full_name' => $request->name,
-            'gender' => $request->gend ?? '-Unknow-',
-            'address' => $request->addr ?? '-Unknow-',
-            'province' => $request->prov ?? '-Unknow-',
-            'dob' => $request->dob ?? '-Unknow-',
-            'phone' => $request->phone ?? '-Unknow-',
+            'email' => $request->id,
+            'name' => $request->name,
+            'gender' => $request->gend,
+            'address' => $request->addr,
+            'province' => $request->prov,
+            'dob' => $request->dob,
+            'phone' => $request->phone,
+            'course' => $request->course
         ]);
-
-        if ($request->pass) {
-            $cust->course = $request->course;
-            $cust->save();
-        }
 
         if ($request->pass) {
             $request->validate([
@@ -95,7 +95,8 @@ class CustomerController extends Controller
     }
 
     public function deleteCustomer(Request $request) {
-        Customer::where('citizen_id', $request->delId)->delete();
+        $cust = Customer::find($request->delId);
+        $cust->delete();
         return response()->json(['message' => $request->delId]);
     }
 
@@ -103,38 +104,38 @@ class CustomerController extends Controller
         $datas = json_decode($request->data);
 
         foreach ($datas as $data) {
-            $cus = Customer::find($data[7]);
-            if (!$cus) {
-                Customer::create([
-                    "full_name" => $data[0],
+            $cus = Customer::where('email', $data[7])->count();
+            if (!($cus > 0)) {
+                $cust = Customer::create([
+                    "name" => $data[0],
                     "gender" => $data[1],
-                    "brn" => json_encode([$data[3],$data[2]]),
+                    "brn" => $data[3],
+                    "agn" => $data[2],
                     "course" => $data[4],
                     "phone" => $data[5],
                     "address" => $data[6],
-                    "citizen_id" => $data[7],
+                    "email" => $data[7],
                     "password" => Hash::make($data[7]),
-                    "province" => '-Unknow-',
-                    "dob" => '-Unknow-',
-                    "staff" => auth()->user()->id
+                    'role' => 'customer'
                 ]);
+                $cust->assignRole('customer');
             }
         }
         return response()->json(['success' => "Data has been saved!", 'count' => count($datas ?? [])]);
     }
 
     public function deletedCustomer() {
-        $customers = Customer::onlyTrashed()->orderBy('created_at', 'desc')->get();
+        $customers = Customer::role('customer')->onlyTrashed()->orderBy('created_at', 'desc')->get();
         return view('pages.deleted-customer', compact('customers'));
     }
 
     public function deletePerm(Request $request) {
-        Customer::onlyTrashed()->where('citizen_id' , $request->delId)->forceDelete();
+        Customer::onlyTrashed()->where('id' , $request->delId)->forceDelete();
         return response()->json(['message' => $request->delId]);
     }
 
     public function reuseCustomer(Request $request) {
-        Customer::where('citizen_id' , $request->reuid)->restore();
+        Customer::where('id' , $request->reuid)->restore();
         return response()->json(['message' => $request->reuid]);
     }
 

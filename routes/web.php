@@ -14,25 +14,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/customer-login', [App\Http\Controllers\HomeController::class, 'customerLogin'])->withoutMiddleware('auth')->name('customer-login');
-Route::post('/customer-auth', [App\Http\Controllers\CustomerController::class, 'customerAuth'])->withoutMiddleware('auth')->name('customer-auth');
-Route::get('/logmeout', function (Request $request) {
-    // if (auth()->guard('web')->check()) {
-    //     auth()->guard('web')->logout();
-    // } elseif (auth()->guard('customer')->check()) {
-    //     auth()->guard('customer')->logout();
-    // }
-    auth()->logout();
-    auth()->guard('customer')->logout();
-    return redirect()->route('customer-login');
-})->name('logmeout')->withoutMiddleware('auth')->middleware('auth:customer');
-// Route::get('/', function () {
-//     return redirect()->route('login');
-// });
 
 Auth::routes();
-Route::get('/main', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->withoutMiddleware('auth')->middleware('auth:customer');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])->name('userTable');
 Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable');
 // Route::get('/permissions', [App\Http\Controllers\HomeController::class, 'permTable'])->name('user.perm');

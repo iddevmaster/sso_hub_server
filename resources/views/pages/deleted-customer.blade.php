@@ -16,7 +16,7 @@
                         <table class="table table-hover display nowrap" id="customerTable" style="width:100%;">
                             <thead>
                                 <tr class="table-dark">
-                                    <th class="text-start">ID</th>
+                                    <th class="text-start">Citizen ID</th>
                                     <th>Name</th>
                                     <th class="text-start">Branch</th>
                                     <th>Course</th>
@@ -26,13 +26,13 @@
                             <tbody>
                                 @foreach ($customers as $index => $user)
                                     <tr>
-                                        <th class="text-start">{{ $user->citizen_id }}</th>
-                                        <td>{{ $user->full_name }}</td>
-                                        <td class="text-start">{{ optional($user->getBrn)->name }}</td>
+                                        <th class="text-start">{{ $user->email }}</th>
+                                        <td>{{ $user->name }}</td>
+                                        <td class="text-start">{{ $user->brn }}</td>
                                         <td>{{ $user->course }}</td>
                                         <td >
-                                            <button class="btn btn-sm btn-warning reuseBtn" value="{{ $user->citizen_id }}" data-toggle="tooltip" title="Reuse"><i class="bi bi-recycle"></i></button>
-                                            <button class="btn btn-sm btn-danger delBtn" value="{{ $user->citizen_id }}" data-toggle="tooltip" title="Delete permanently"><i class="bi bi-trash3"></i></button>
+                                            <button class="btn btn-sm btn-warning reuseBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Reuse"><i class="bi bi-recycle"></i></button>
+                                            <button class="btn btn-sm btn-danger delBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Delete permanently"><i class="bi bi-trash3"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach

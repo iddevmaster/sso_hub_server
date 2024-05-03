@@ -8,7 +8,7 @@
                     <div class="text-center py-3">
                         <img src="/imgs/logo.png" width="100" alt="">
                         <h1 class="m-0 fw-bold">Smart <span style="color: #F15A29">HUB</span></h1>
-                        <p><span class="fw-bold" style="color: #F15A29">Train</span>ingzenter</p>
+                        <p><span class="fw-bold" style="color: #F15A29">Training</span>zenter</p>
                     </div>
                     <div class="mb-3">
                         <form method="POST" action="{{ route('login') }}">
@@ -18,7 +18,7 @@
                                 <input type="text" class="form-control @error('email') is-invalid @enderror"
                                     value="admin" name="email" required autofocus autocomplete="email" id="email"
                                     placeholder="Username">
-                                <label for="email">ชื่อผู้ใช้</label>
+                                <label for="email">ชื่อผู้ใช้หรือเลขบัตรประชาชน</label>
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -40,15 +40,12 @@
                                 <button type="submit" class="btn w-100" id="submitbtn">
                                     เข้าสู่ระบบ
                                 </button>
-                                <p type="submit" class="w-100 my-1">
-                                    หรือ <a href="/customer-login">เข้าสู่ระบบด้วยบัญชีทั่วไป</a>
-                                </p>
                             </div>
                         </form>
                     </div>
                     <div class="d-flex justify-content-center" id="copyright">
                         <i class="bi bi-c-circle"> </i>
-                        <p class="m-0">{{ now()->format('Y') }} iddrives .co.ltd</p>
+                        <p class="m-0">{{ now()->format('Y') }} iddrives.co.ltd</p>
                     </div>
                 </div>
             </div>

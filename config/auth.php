@@ -45,11 +45,6 @@ return [
             'driver' => 'passport',
             'provider' => 'users',
         ],
-
-        'customer' => [
-            'driver' => 'session',
-            'provider' => 'customers', // สร้าง custom provider สำหรับ customer
-        ],
     ],
 
     /*
@@ -73,11 +68,6 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-        ],
-
-        'customers' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Customer::class,
         ],
     ],
 
