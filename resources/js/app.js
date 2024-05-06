@@ -10,6 +10,11 @@ let customerTable = new DataTable('#customerTable', {
     responsive: true
 });
 
+let coursetable = new DataTable('#courseTable', {
+    select: true,
+    scrollX: true,
+});
+
 let agntable = new DataTable('#agnTable', {
     select: true,
     scrollX: true,

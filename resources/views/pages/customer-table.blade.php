@@ -57,7 +57,7 @@
                                         <th class="text-start">{{ $user->email }}</th>
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
-                                        <td>{{ $user->course }}</td>
+                                        <td>{{ optional($user->getCourse)->name }}</td>
                                         <td >
                                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#userdetail{{ $index }}" data-toggle="tooltip" title="Detail"><i class="bi bi-person-vcard"></i></button>
                                             <!-- Modal -->
@@ -77,7 +77,7 @@
                                                             <div class="col"><b>Province:</b> {{ $user->province }}</div>
                                                             <div class="col"><b>DoB:</b> {{ $user->dob }}</div>
                                                             <div class="col"><b>Phone:</b> {{ $user->phone }}</div>
-                                                            <div class="col"><b>Course:</b> {{ $user->course }}</div>
+                                                            <div class="col"><b>Course:</b> {{ optional($user->getCourse)->name }}</div>
                                                             <div class="col-12"><b>Branch: </b> {{ $user->brn . ' / ' . $user->agn}}</div>
                                                         </div>
                                                     </div>
@@ -249,11 +249,9 @@
                         </div>
                         <select class="form-select" aria-label="selectCourse" id="course">
                             <option value="" selected disabled>* Select course</option>
-                            <option value="หลักสูตรเรียนขับรถจักรยานยนต์">หลักสูตรเรียนขับรถจักรยานยนต์</option>
-                            <option value="หลักสูตรเรียนขับรถยนต์(มีพื้นฐาน)">หลักสูตรเรียนขับรถยนต์ (มีพื้นฐาน)</option>
-                            <option value="หลักสูตรเรียนขับรถยนต์(ไม่มีพื้นฐาน)">หลักสูตรเรียนขับรถยนต์ (ไม่มีพื้นฐาน)</option>
-                            <option value="หลักสูตรเรียนขับขี่รถขนส่ง(ท.2)">หลักสูตรเรียนขับขี่รถขนส่ง(ท.2)</option>
-                            <option value="หลักสูตรเรียนขับขี่รถขนส่ง(ท.3)">หลักสูตรเรียนขับขี่รถขนส่ง(ท.3)</option>
+                            @foreach ($courses ?? [] as $course)
+                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                            @endforeach
                         </select>
                     `,
                     showCancelButton: true,
@@ -342,11 +340,9 @@
                         </div>
                         <select class="form-select" aria-label="selectCourse" id="course">
                             <option value="" selected disabled>* Select course</option>
-                            <option value="หลักสูตรเรียนขับรถจักรยานยนต์" ${custom.course == 'หลักสูตรเรียนขับรถจักรยานยนต์' ? 'selected' : ''}>หลักสูตรเรียนขับรถจักรยานยนต์</option>
-                            <option value="หลักสูตรเรียนขับรถยนต์(มีพื้นฐาน)" ${custom.course == 'หลักสูตรเรียนขับรถยนต์(มีพื้นฐาน)' ? 'selected' : ''}>หลักสูตรเรียนขับรถยนต์ (มีพื้นฐาน)</option>
-                            <option value="หลักสูตรเรียนขับรถยนต์(ไม่มีพื้นฐาน)" ${custom.course == 'หลักสูตรเรียนขับรถยนต์(ไม่มีพื้นฐาน)' ? 'selected' : ''}>หลักสูตรเรียนขับรถยนต์ (ไม่มีพื้นฐาน)</option>
-                            <option value="หลักสูตรเรียนขับขี่รถขนส่ง(ท.2)" ${custom.course == 'หลักสูตรเรียนขับขี่รถขนส่ง(ท.2)' ? 'selected' : ''}>หลักสูตรเรียนขับขี่รถขนส่ง(ท.2)</option>
-                            <option value="หลักสูตรเรียนขับขี่รถขนส่ง(ท.3)" ${custom.course == 'หลักสูตรเรียนขับขี่รถขนส่ง(ท.3)' ? 'selected' : ''}>หลักสูตรเรียนขับขี่รถขนส่ง(ท.3)</option>
+                            @foreach ($courses ?? [] as $course)
+                                <option value="{{ $course->id }}" ${ custom.course == {{ $course->id }} ? 'selected' : '' }>{{ $course->name }}</option>
+                            @endforeach
                         </select>
                     `,
                     showCancelButton: true,

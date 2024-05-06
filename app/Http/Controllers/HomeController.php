@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agency;
 use App\Models\Branch;
+use App\Models\Course;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,7 +58,9 @@ class HomeController extends Controller
         $brns = Branch::all();
         $perms = Permission::all();
         $roles = Role::all();
-        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles'));
+        $courses = Course::all();
+
+        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses'));
     }
 
     public function permTable() {
@@ -71,6 +74,12 @@ class HomeController extends Controller
         if ($request->addType === 'agn') {
             Agency::create([
                 'name' => $request->agnname,
+            ]);
+        } elseif ($request->addType === 'course') {
+            $last_course = Course::where('from', 1)->orderBy('id', 'desc')->first();
+            Course::create([
+                'code' => ($last_course ? $last_course->code + 1 : 0),
+                'name' => $request->cname,
             ]);
         } elseif ($request->addType === 'brn') {
             Branch::create([
@@ -90,6 +99,10 @@ class HomeController extends Controller
             Agency::find($request->eid)->update([
                 'name' => $request->agnname,
             ]);
+        } elseif ($request->addType === 'course') {
+            Course::find($request->eid)->update([
+                'name' => $request->cname,
+            ]);
         } elseif ($request->addType === 'brn') {
             Branch::find($request->eid)->update([
                 'name' => $request->bName,
@@ -102,6 +115,8 @@ class HomeController extends Controller
     public function deleteData(Request $request) {
         if ($request->deltype === 'agn') {
             Agency::find($request->delid)->delete();
+        } elseif ($request->deltype === 'course') {
+            Course::find($request->delid)->delete();
         } elseif ($request->deltype === 'brn') {
             Branch::find($request->delid)->delete();
         } elseif ($request->deltype === 'perm') {
@@ -187,7 +202,8 @@ class HomeController extends Controller
 
     public function customerTable() {
         $customers = User::role('customer')->orderBy('id', 'desc')->get();
-        return view('pages.customer-table', compact('customers'));
+        $courses = Course::orderBy('id', 'desc')->get();
+        return view('pages.customer-table', compact('customers', 'courses'));
     }
 
     public function customerLogin() {

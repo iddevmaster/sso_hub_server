@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Course;
 use App\Models\User as Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,13 +106,21 @@ class CustomerController extends Controller
 
         foreach ($datas as $data) {
             $cus = Customer::where('email', $data[7])->count();
+            $course = Course::where('name', $data[4])->first();
+            $last_course = Course::where('from', true)->orderBy('id', 'desc')->first();
+            if (!($course ?? false)) {
+                $course = Course::create([
+                    'code' => ($last_course ? $last_course->code + 1 : 0),
+                    'name' => $data[4],
+                ]);
+            }
             if (!($cus > 0)) {
                 $cust = Customer::create([
                     "name" => $data[0],
                     "gender" => $data[1],
                     "brn" => $data[3],
                     "agn" => $data[2],
-                    "course" => $data[4],
+                    "course" => $course ? $course->id : $data[4],
                     "phone" => $data[5],
                     "address" => $data[6],
                     "email" => $data[7],

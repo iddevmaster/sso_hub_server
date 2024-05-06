@@ -5,6 +5,41 @@
         <div class="row justify-content-center">
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
+                    <h1 class="text-center my-3">Courses</h1>
+                    <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="course">Add</button></div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body bg-white">
+                        <table class="table table-hover display nowrap w-100" id="courseTable">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($courses as $index => $course)
+                                    <tr>
+                                        @if ($course->from)
+                                            <th>TZ{{ sprintf('%02d', $course->code) . date('Y') }}</th>
+                                        @else
+                                            <th>{{ $course->code }}</th>
+                                        @endif
+                                        <td>{{ $course->name }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning editBtn" editType="course" value="{{ $course->name }}" editId="{{ $course->id }}"><i class="bi bi-gear"></i></button>
+                                            <button class="btn btn-sm btn-danger delBtn" delType="course" delId="{{ $course->id }}"><i class="bi bi-trash3"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 mb-4">
+                <div class="d-flex justify-content-between">
                     <h1 class="text-center my-3">Agencies</h1>
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="agn">Add</button></div>
                 </div>
@@ -182,6 +217,57 @@
                                 });
                             } else {
                                 Swal.showValidationMessage(`Please enter agency name.`);
+                            }
+                        },
+                        showLoaderOnConfirm: true,
+                        allowOutsideClick: () => !Swal.isLoading()
+                    });
+                } else if (atype === 'course') {
+                    Swal.fire({
+                        title: 'Course',
+                        html: `
+                            <div class="mb-3">
+                                <input type="text" maxlength="100" class="form-control" maxlength="100" id="cname" placeholder="Course name">
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const cname = document.getElementById("cname").value;
+                            if (cname) {
+                                $.ajax({
+                                    url: "/data/add",
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: { addType:atype, cname:cname},
+                                    success: function (response) {
+                                        // console.log(response);
+                                        Swal.fire({
+                                            title: "Success",
+                                            // text: "That thing is still around?",
+                                            icon: "success"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: (error) => {
+                                        // console.log(error);
+                                        Swal.fire({
+                                            title: "Sorry!",
+                                            text: "Something wrong!",
+                                            icon: "error"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                Swal.showValidationMessage(`Please enter name and code.`);
                             }
                         },
                         showLoaderOnConfirm: true,
@@ -389,6 +475,57 @@
                                 });
                             } else {
                                 Swal.showValidationMessage(`Please enter agency name.`);
+                            }
+                        },
+                        showLoaderOnConfirm: true,
+                        allowOutsideClick: () => !Swal.isLoading()
+                    });
+                } else if (edittype === 'course') {
+                    Swal.fire({
+                        title: 'Branch',
+                        html: `
+                            <div class="mb-3">
+                                <input type="text" maxlength="100" value="${name}" class="form-control" maxlength="100" id="cname" placeholder="Course name">
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const cname = document.getElementById("cname").value;
+                            if (cname) {
+                                $.ajax({
+                                    url: "/data/update",
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: { addType:edittype, cname:cname, eid:editId},
+                                    success: function (response) {
+                                        // console.log(response);
+                                        Swal.fire({
+                                            title: "Success",
+                                            // text: "That thing is still around?",
+                                            icon: "success"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: (error) => {
+                                        // console.log(error);
+                                        Swal.fire({
+                                            title: "Sorry!",
+                                            text: "Something wrong!",
+                                            icon: "error"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                Swal.showValidationMessage(`Please enter name and select agency.`);
                             }
                         },
                         showLoaderOnConfirm: true,
