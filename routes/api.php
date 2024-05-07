@@ -40,9 +40,14 @@ Route::middleware('auth:api', 'scope:kst-plus')->get('/kst-plus', function (Requ
 
 Route::middleware('auth:api')->get('/logmeout', function (Request $request) {
     $user = $request->user();
-    $accessToken = $user->token();
-    DB::table("oauth_refresh_tokens")->where("access_token_id", $accessToken->id)->delete();
-    $accessToken->delete();
+    // $accessToken = $user->token();
+    $accessTokens = DB::table("oauth_access_tokens")->where("user_id", $user->id)->get();
+    foreach ($accessTokens as $accessToken) {
+        DB::table("oauth_refresh_tokens")->where("access_token_id", $accessToken->id)->delete();
+        $accessToken->delete();
+    }
+    // DB::table("oauth_refresh_tokens")->where("access_token_id", $accessToken->id)->delete();
+    // $accessToken->delete();
     return response()->json([
         "message" => "Revoked"
     ]);
