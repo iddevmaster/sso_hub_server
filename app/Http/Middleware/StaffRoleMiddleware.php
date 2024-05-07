@@ -17,11 +17,11 @@ class StaffRoleMiddleware
     public function handle($request, Closure $next)
     {
         // Check if the user is authenticated and has the 'admin' role
-        if (Auth::check() && Auth::user()->hasAnyRoles(['admin', 'staff'])) {
+        if (Auth::check() && Auth::user()->hasAnyRole(['admin', 'staff'])) {
             return $next($request);
         }
 
         // If the user is not authenticated or doesn't have the 'admin' role, you can redirect them or return an error response
-        return redirect()->route('/');
+        return redirect('/');
     }
 }

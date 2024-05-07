@@ -22,6 +22,6 @@ class AdminRoleMiddleware
         }
 
         // If the user is not authenticated or doesn't have the 'admin' role, you can redirect them or return an error response
-        return redirect()->route('/');
+        return redirect('/');
     }
 }
