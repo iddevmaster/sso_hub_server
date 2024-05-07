@@ -25,10 +25,11 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     @livewireStyles
+
 </head>
-<body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+<body data-bs-theme="{{ session()->get('theme') }}" style="transition: background 0.1s linear;">
+    <div id="app" >
+        <nav class="navbar navbar-expand-md shadow-sm">
             <div class="container">
                 <img src="/imgs/logo.png" width="50" alt="">
                 <a class="navbar-brand mx-2" href="{{ url('/') }}">
@@ -78,6 +79,12 @@
                                 </li>
                             @endif
                         @else
+                            <li class="d-flex align-items-center">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" id="toggleTheme" type="checkbox" role="switch" id="flexSwitchCheckDefault" {{ session()->get('theme') == 'dark' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="flexSwitchCheckDefault"></label>
+                                </div>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name ? Auth::user()->name : Auth::user()->full_name }}
@@ -115,5 +122,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @livewireScripts
+    <script>
+        $(document).ready(function() {
+            $('#toggleTheme').change(async function() {
+                var isThemeDark = $(this).is(':checked');
+                console.log('Checkbox state:', isThemeDark); // Now this should log the correct state
+                await $.ajax({
+                    url: "/toggle-theme/" + isThemeDark,
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (!response.success) { // Adjust success check based on your API's response format
+                            console.error('toggle-theme failed: ', response); // Adjust error handling
+                        } else {
+                            $('body').attr('data-bs-theme', response.theme);
+                            console.log(response.success);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error toggle-theme');
+                    }
+                });
+            });
+        });
+
+    </script>
 </body>
 </html>

@@ -9,7 +9,7 @@
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white">
+                    <div class="card-body">
                         <livewire:user-permission />
                     </div>
                 </div>

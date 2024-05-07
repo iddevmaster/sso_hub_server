@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
+Route::get('/toggle-theme/{isdark}', [App\Http\Controllers\HomeController::class, 'toggleTheme'])->name('toggleTheme');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])->name('userTable');
 Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable');
 // Route::get('/permissions', [App\Http\Controllers\HomeController::class, 'permTable'])->name('user.perm');

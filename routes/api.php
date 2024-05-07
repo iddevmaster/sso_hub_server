@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
-    return $request->user();
+    $user_data = [
+        "name" => $request->user()->name,
+        "username" => $request->user()->email,
+        "role" => $request->user()->role,
+        "course" => optional($request->user()->getCourse)->code
+    ];
+    return $user_data;
 });
 
 Route::middleware('auth:api', 'scope:i-prompt')->get('/i-prompt', function (Request $request) {
@@ -40,3 +47,9 @@ Route::middleware('auth:api')->get('/logmeout', function (Request $request) {
         "message" => "Revoked"
     ]);
 });
+
+Route::middleware('auth.basic')->get('/courses', function () {
+    $courses = Course::get(['code', 'name']);
+    return $courses;
+});
+

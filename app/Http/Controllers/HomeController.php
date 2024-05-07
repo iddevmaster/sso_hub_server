@@ -33,8 +33,21 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (!session()->get('theme')) {
+            session()->put('theme', 'light');
+        }
         return view('home');
     }
+
+    public function toggleTheme($isDark) {
+        if ($isDark == 'true') {
+            session()->put('theme', 'dark');
+        } else {
+            session()->put('theme', 'light');
+        }
+        return response()->json(['success' => "Theme is set to " . session()->get('theme'), 'theme' => session()->get('theme')]);
+    }
+
     public function getDifferentAccount (Request $request) {
         // Log out the current user
         Auth::logout();
@@ -45,7 +58,7 @@ class HomeController extends Controller
     }
 
     public function userTable() {
-        $users = User::orderBy('id', 'desc')->get();
+        $users = User::withoutRole('customer')->orderBy('id', 'desc')->get();
         $agns = Agency::all();
         $brns = Branch::all();
         $perms = Permission::all();

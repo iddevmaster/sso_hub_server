@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white table-responsive">
+                    <div class="card-body table-responsive">
                         <table class="table table-hover display nowrap" id="customerTable" style="width:100%;">
                             <thead>
                                 <tr class="table-dark">

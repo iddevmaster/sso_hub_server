@@ -9,7 +9,7 @@
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="course">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white">
+                    <div class="card-body">
                         <table class="table table-hover display nowrap w-100" id="courseTable">
                             <thead>
                                 <tr class="table-dark">
@@ -44,7 +44,7 @@
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="agn">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white">
+                    <div class="card-body">
                         <table class="table table-hover display nowrap w-100" id="agnTable">
                             <thead>
                                 <tr class="table-dark">
@@ -75,7 +75,7 @@
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="brn">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white">
+                    <div class="card-body">
                         <table class="table table-hover display" id="brnTable">
                             <thead>
                                 <tr class="table-dark">
@@ -141,7 +141,7 @@
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="role">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
-                    <div class="card-body bg-white">
+                    <div class="card-body">
                         <table class="table table-hover display" id="roleTable">
                             <thead>
                                 <tr class="table-dark">
@@ -428,7 +428,7 @@
                 }
             });
 
-            $(".editBtn").click(function() {
+            $(document).on("click", ".editBtn", function() {
                 const edittype = $(this).attr("editType");
                 const editId = $(this).attr("editId");
                 const name = $(this).val();
@@ -593,7 +593,7 @@
                 }
             });
 
-            $(".delBtn").click(function() {
+            $(document).on("click", ".delBtn", function() {
                 const delType = $(this).attr("delType");
                 const delId = $(this).attr("delId");
                 Swal.fire({
