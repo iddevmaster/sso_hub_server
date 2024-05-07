@@ -44,8 +44,9 @@ Route::middleware('auth:api')->get('/logmeout', function (Request $request) {
     $accessTokens = DB::table("oauth_access_tokens")->where("user_id", $user->id)->get();
     foreach ($accessTokens as $accessToken) {
         DB::table("oauth_refresh_tokens")->where("access_token_id", $accessToken->id)->delete();
-        $accessToken->delete();
     }
+
+    $accessTokens = DB::table("oauth_access_tokens")->where("user_id", $user->id)->delete();
     // DB::table("oauth_refresh_tokens")->where("access_token_id", $accessToken->id)->delete();
     // $accessToken->delete();
     return response()->json([
