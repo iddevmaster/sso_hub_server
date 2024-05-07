@@ -19,7 +19,7 @@ Auth::routes();
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 Route::get('/toggle-theme/{isdark}', [App\Http\Controllers\HomeController::class, 'toggleTheme'])->name('toggleTheme');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])->name('userTable');
-Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable');
+Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable')->middleware('admin');
 // Route::get('/permissions', [App\Http\Controllers\HomeController::class, 'permTable'])->name('user.perm');
 Route::get('/customers', [App\Http\Controllers\HomeController::class, 'customerTable'])->name('customerTable');
 Route::post('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');
