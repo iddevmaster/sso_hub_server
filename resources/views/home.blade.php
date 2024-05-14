@@ -39,7 +39,7 @@
                                     <p class="mb-0">Hub-Training</p>
                                 </div>
                             </a>
-                            <a href="http://checkbefore.trainingzenter.com/sso/{{ $user->email }}/{{ $user->name }}/{{ $course_type }}" target="_BLANK" class="link-underline link-underline-opacity-0">
+                            <a href="http://checkbefore.trainingzenter.com/sso/{{ $citizen_id }}/{{ $user->name }}/{{ $course_type }}" target="_BLANK" class="link-underline link-underline-opacity-0">
                                 <div class="service p-2 rounded">
                                     <img src="/imgs/logoiddrives.png" width="50" alt="">
                                     <p class="mb-0">Check-Before</p>

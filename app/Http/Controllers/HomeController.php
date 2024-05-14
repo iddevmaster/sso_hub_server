@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -41,16 +42,16 @@ class HomeController extends Controller
         $courses_name = optional($user->getCourse)->name;
         // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
         if (strpos($courses_name, "รถยนต์") !== false) {
-            $course_type = "car";
+            $course_type = Crypt::encrypt("car");
         } elseif (strpos($courses_name, "จักรยานยนต์") !== false) {
-            $course_type = "motobike";
+            $course_type = Crypt::encrypt("motobike");
         } elseif (strpos($courses_name, "บรรทุก") !== false) {
-            $course_type = "trailer";
+            $course_type = Crypt::encrypt("trailer");
         } else {
-            $course_type = "car";
+            $course_type = Crypt::encrypt("car");
         }
-
-        return view('home', compact('course_type', 'user'));
+        $citizen_id = Crypt::encrypt($user->email);
+        return view('home', compact('course_type', 'user', 'citizen_id'));
     }
 
     public function toggleTheme($isDark) {
