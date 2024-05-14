@@ -16,7 +16,7 @@
 
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control @error('email') is-invalid @enderror"
-                                    value="admin" name="email" required autofocus autocomplete="email" id="email"
+                                    value="" name="email" required autofocus autocomplete="email" id="email"
                                     placeholder="Username">
                                 <label for="email">ชื่อผู้ใช้หรือเลขบัตรประชาชน</label>
                                 @error('email')
@@ -27,7 +27,7 @@
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    id="password" placeholder="Password" value="iddrivesadmin" name="password" required
+                                    id="password" placeholder="Password" value="" name="password" required
                                     autocomplete="current-password">
                                 <label for="password">รหัสผ่าน</label>
                                 @error('password')
