@@ -18,7 +18,7 @@
                                 <input type="text" class="form-control @error('email') is-invalid @enderror"
                                     value="" name="email" required autofocus autocomplete="email" id="email"
                                     placeholder="Username">
-                                <label for="email">ชื่อผู้ใช้หรือเลขบัตรประชาชน</label>
+                                <label for="email">เลขบัตรประชาชน</label>
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
