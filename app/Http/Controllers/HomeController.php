@@ -42,13 +42,13 @@ class HomeController extends Controller
         $courses_name = optional($user->getCourse)->name;
         // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
         if (strpos($courses_name, "รถยนต์") !== false) {
-            $course_type = Crypt::encrypt("car");
+            $course_type = "car";
         } elseif (strpos($courses_name, "จักรยานยนต์") !== false) {
-            $course_type = Crypt::encrypt("motobike");
+            $course_type = "motobike";
         } elseif (strpos($courses_name, "บรรทุก") !== false) {
-            $course_type = Crypt::encrypt("trailer");
+            $course_type = "trailer";
         } else {
-            $course_type = Crypt::encrypt("car");
+            $course_type = "car";
         }
         $citizen_id = Crypt::encrypt($user->email);
         return view('home', compact('course_type', 'user', 'citizen_id'));
