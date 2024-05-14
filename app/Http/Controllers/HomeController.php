@@ -50,7 +50,6 @@ class HomeController extends Controller
         } else {
             $course_type = "car";
         }
-        $citizen_id = Crypt::encrypt($user->email);
         return view('home', compact('course_type', 'user', 'citizen_id'));
     }
 
