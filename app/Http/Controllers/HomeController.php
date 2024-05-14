@@ -50,7 +50,7 @@ class HomeController extends Controller
         } else {
             $course_type = "car";
         }
-        return view('home', compact('course_type', 'user', 'citizen_id'));
+        return view('home', compact('course_type', 'user'));
     }
 
     public function toggleTheme($isDark) {
