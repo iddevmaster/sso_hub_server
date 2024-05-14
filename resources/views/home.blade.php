@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm mb-5">
+            {{-- <div class="card shadow-sm mb-5">
                 <div class="card-body">
                     <p class="mb-0 pb-1 fs-5 border-bottom"><span><i class="bi bi-browser-edge"></i></span> Web Informations</p>
 
@@ -25,7 +25,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -33,28 +33,16 @@
 
                     <div class="pt-3 container text-center">
                         <div class="row row-cols-sm-2 row-cols-md-4">
-                            <a href="https://saraban.iddrives.co.th/" target="_BLANK" class="link-underline link-underline-opacity-0">
+                            <a href="http://ksthub.iddriver.com/" target="_BLANK" class="link-underline link-underline-opacity-0">
                                 <div class="service p-2 rounded">
                                     <img src="/imgs/logoiddrives.png" width="50" alt="">
-                                    <p class="mb-0">Saraban</p>
+                                    <p class="mb-0">Hub-Training</p>
                                 </div>
                             </a>
-                            <a href="https://i-prompt.iddrives.co.th/" target="_BLANK" class="link-underline link-underline-opacity-0">
+                            <a href="https://checkbefore.trainingzenter.com/sso/{{ $user->email }}/{{ $user->name }}/{{ $course_type }}" target="_BLANK" class="link-underline link-underline-opacity-0">
                                 <div class="service p-2 rounded">
                                     <img src="/imgs/logoiddrives.png" width="50" alt="">
-                                    <p class="mb-0">I-Prompt</p>
-                                </div>
-                            </a>
-                            <a href="https://kstplus.iddrives.co.th/" target="_BLANK" class="link-underline link-underline-opacity-0">
-                                <div class="service p-2 rounded">
-                                    <img src="/imgs/logoiddrives.png" width="50" alt="">
-                                    <p class="mb-0">KSTplus</p>
-                                </div>
-                            </a>
-                            <a href="https://hrc.iddrives.co.th/" target="_BLANK" class="link-underline link-underline-opacity-0">
-                                <div class="service p-2 rounded">
-                                    <img src="/imgs/logoiddrives.png" width="50" alt="">
-                                    <p class="mb-0">HRC</p>
+                                    <p class="mb-0">Check-Before</p>
                                 </div>
                             </a>
                         </div>

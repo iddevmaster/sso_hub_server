@@ -36,7 +36,21 @@ class HomeController extends Controller
         if (!session()->get('theme')) {
             session()->put('theme', 'light');
         }
-        return view('home');
+
+        $user = auth()->user();
+        $courses_name = optional($user->getCourse)->name;
+        // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
+        if (strpos($courses_name, "รถยนต์") !== false) {
+            $course_type = "car";
+        } elseif (strpos($courses_name, "จักรยานยนต์") !== false) {
+            $course_type = "motobike";
+        } elseif (strpos($courses_name, "บรรทุก") !== false) {
+            $course_type = "trailer";
+        } else {
+            $course_type = "car";
+        }
+
+        return view('home', compact('course_type', 'user'));
     }
 
     public function toggleTheme($isDark) {
