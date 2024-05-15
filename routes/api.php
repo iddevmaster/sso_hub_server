@@ -17,11 +17,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
+    $course = App\Models\Course::where('id', $request->user()->course[0])->first(['code', 'name']);
     $user_data = [
         "name" => $request->user()->name,
         "username" => $request->user()->email,
         "role" => $request->user()->role,
-        "course" => optional($request->user()->getCourse)->code
+        "course_code" => $course->code,
+        "course_name" => $course->name,
+        "branch" => $request->user()->brn,
+        "agency" => $request->user()->agn,
     ];
     return $user_data;
 });
@@ -56,6 +60,16 @@ Route::middleware('auth:api')->get('/logmeout', function (Request $request) {
 
 Route::middleware('auth.basic')->get('/courses', function () {
     $courses = Course::get(['code', 'name']);
-    return $courses;
+    $res = [];
+    foreach ($courses as $course) {
+        $charsOnly = preg_replace('/\d+/', '', $course->code);
+        $agn = App\Models\Agency::where('prefix', $charsOnly)->first();
+        $res[] = [
+            "code" => $course->code,
+            "name" => $course->name,
+            "agn" => $agn->name,
+        ];
+    }
+    return $res;
 });
 

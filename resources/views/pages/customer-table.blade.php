@@ -8,9 +8,9 @@
                     <h1 class="text-center">Customers</h1>
                     <div class="d-flex gap-2">
                         <div class="d-flex"><button class="btn btn-success align-self-center addBtn" data-toggle="tooltip" title="Add Customer"><i class="bi bi-plus-square"></i></button></div>
+                        <div class="d-flex"><button class="btn btn-primary align-self-center importBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" title="Import from file"><i class="bi bi-arrow-down-square"></i></button></div>
                         @role('admin')
                             <a class="d-flex" href="{{ route('deleted-customers') }}"><button class="btn btn-secondary align-self-center" data-toggle="tooltip" title="Deleted customers"><i class="bi bi-recycle"></i></button></a>
-                            <div class="d-flex"><button class="btn btn-primary align-self-center importBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" title="Import from file"><i class="bi bi-arrow-down-square"></i></button></div>
                         @endrole
 
                         <!-- Modal -->
@@ -57,7 +57,10 @@
                                         <th class="text-start">{{ $user->email }}</th>
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
-                                        <td>{{ optional($user->getCourse)->name }}</td>
+                                        @php
+                                            $course_name = App\Models\Course::where('id', $user->course[0])->first(['name']);
+                                        @endphp
+                                        <td>{{ $course_name->name }}</td>
                                         <td >
                                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#userdetail{{ $index }}" data-toggle="tooltip" title="Detail"><i class="bi bi-person-vcard"></i></button>
                                             <!-- Modal -->
@@ -73,12 +76,12 @@
                                                             <div class="col"><b>Citizen ID:</b> {{ $user->email }}</div>
                                                             <div class="col"><b>Name:</b> {{ $user->name }}</div>
                                                             <div class="col"><b>Gender:</b> {{ $user->gender }}</div>
-                                                            <div class="col"><b>Address:</b> {{ $user->address }}</div>
                                                             <div class="col"><b>Province:</b> {{ $user->province }}</div>
                                                             <div class="col"><b>DoB:</b> {{ $user->dob }}</div>
                                                             <div class="col"><b>Phone:</b> {{ $user->phone }}</div>
-                                                            <div class="col"><b>Course:</b> {{ optional($user->getCourse)->name }}</div>
+                                                            <div class="col-12"><b>Address:</b> {{ $user->address }}</div>
                                                             <div class="col-12"><b>Branch: </b> {{ $user->brn . ' / ' . $user->agn}}</div>
+                                                            <div class="col-12"><b>Course:</b> {{ $course_name->name }}</div>
                                                         </div>
                                                     </div>
                                                 </div>

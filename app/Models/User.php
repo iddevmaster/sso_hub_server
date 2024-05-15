@@ -37,8 +37,9 @@ class User extends Authenticatable
         'life_time',
     ];
 
-    public function getCourse() {
-        return $this->belongsTo(Course::class, 'course');
+    public function getCourseAttribute($value)
+    {
+        return json_decode($value, true);
     }
     public function getBrn() {
         return $this->belongsTo(Branch::class, 'brn');

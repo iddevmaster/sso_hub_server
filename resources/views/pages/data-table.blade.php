@@ -6,7 +6,9 @@
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
                     <h1 class="text-center my-3">Courses</h1>
-                    <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="course">Add</button></div>
+                    @role('staff')
+                        <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="course">Add</button></div>
+                    @endrole
                 </div>
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -21,11 +23,7 @@
                             <tbody>
                                 @foreach ($courses as $index => $course)
                                     <tr>
-                                        @if ($course->from)
-                                            <th>TZ{{ sprintf('%02d', $course->code) . date('Y') }}</th>
-                                        @else
-                                            <th>{{ $course->code }}</th>
-                                        @endif
+                                        <th>{{ $course->code }}</th>
                                         <td>{{ $course->name }}</td>
                                         <td>
                                             <button class="btn btn-sm btn-warning editBtn" editType="course" value="{{ $course->name }}" editId="{{ $course->id }}"><i class="bi bi-gear"></i></button>
@@ -38,6 +36,8 @@
                     </div>
                 </div>
             </div>
+
+            @role('admin')
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
                     <h1 class="text-center my-3">Agencies</h1>
@@ -50,6 +50,7 @@
                                 <tr class="table-dark">
                                     <th>#</th>
                                     <th>Name</th>
+                                    <th>Prefix</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -58,8 +59,9 @@
                                     <tr>
                                         <th>{{ $index + 1 }}</th>
                                         <td>{{ $agn->name }}</td>
+                                        <td>{{ $agn->prefix ?? '-' }}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-warning editBtn" editType="agn" value="{{ $agn->name }}" editId="{{ $agn->id }}"><i class="bi bi-gear"></i></button>
+                                            <button class="btn btn-sm btn-warning editBtn" editType="agn" value="{{ $agn->name }}" eprefix="{{ $agn->prefix }}" editId="{{ $agn->id }}"><i class="bi bi-gear"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" delType="agn" delId="{{ $agn->id }}"><i class="bi bi-trash3"></i></button>
                                         </td>
                                     </tr>
@@ -167,6 +169,7 @@
                     </div>
                 </div>
             </div>
+            @endrole
         </div>
     </div>
 
@@ -178,18 +181,22 @@
                 if (atype === 'agn') {
                     Swal.fire({
                         title: 'Agency',
-                        input: "text",
-                        inputLabel: "Enter agency name",
+                        html: `
+                            <input id="agnname" class="swal2-input" placeholder="Enter agency name">
+                            <input id="prefix" class="swal2-input" placeholder="Enter prefix">
+                        `,
                         showCancelButton: true,
-                        preConfirm: (agnName) => {
-                            if (agnName) {
+                        preConfirm: () => {
+                            const agn_name = document.getElementById("agnname").value;
+                            const agn_prefix = document.getElementById("prefix").value;
+                            if (agn_name && agn_prefix) {
                                 $.ajax({
                                     url: "/data/add",
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
-                                    data: { addType:atype ,agnname:agnName},
+                                    data: { addType:atype ,agnname:agn_name, prefix:agn_prefix},
                                     success: function (response) {
                                         // console.log(response);
                                         Swal.fire({
@@ -216,7 +223,7 @@
                                     }
                                 });
                             } else {
-                                Swal.showValidationMessage(`Please enter agency name.`);
+                                Swal.showValidationMessage(`Please enter input.`);
                             }
                         },
                         showLoaderOnConfirm: true,
@@ -433,21 +440,25 @@
                 const editId = $(this).attr("editId");
                 const name = $(this).val();
                 if (edittype === 'agn') {
+                    const eprefix = $(this).attr("eprefix");
                     Swal.fire({
                         title: 'Agency',
-                        input: "text",
-                        inputValue: name,
-                        inputLabel: "Enter agency name",
+                        html: `
+                            <input id="agnname" class="swal2-input" value="${name}" placeholder="Enter agency name">
+                            <input id="prefix" class="swal2-input" value="${eprefix}" placeholder="Enter prefix">
+                        `,
                         showCancelButton: true,
-                        preConfirm: (agnName) => {
-                            if (agnName) {
+                        preConfirm: () => {
+                            const agn_name = document.getElementById("agnname").value;
+                            const agn_prefix = document.getElementById("prefix").value;
+                            if (agn_name && agn_prefix) {
                                 $.ajax({
                                     url: "/data/update",
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
-                                    data: { addType:edittype ,agnname:agnName, eid:editId},
+                                    data: { addType:edittype ,agnname:agn_name, eid:editId, prefix:agn_prefix},
                                     success: function (response) {
                                         // console.log(response);
                                         Swal.fire({

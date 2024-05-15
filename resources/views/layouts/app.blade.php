@@ -56,10 +56,10 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('userTable') }}">Users</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('dataTable') }}">Data</a>
-                                </li>
                             @endrole
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('dataTable') }}">Data</a>
+                            </li>
                         @endhasanyrole
                     </ul>
 

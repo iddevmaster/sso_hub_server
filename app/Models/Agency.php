@@ -12,5 +12,6 @@ class Agency extends Model
     protected $fillable = [
         'name',
         'icon',
+        'prefix',
     ];
 }

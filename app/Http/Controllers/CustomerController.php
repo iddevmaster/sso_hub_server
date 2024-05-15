@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Models\User as Customer;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +52,7 @@ class CustomerController extends Controller
             'province' => $request->prov,
             'dob' => $request->dob,
             'phone' => $request->phone,
-            'course' => $request->course,
+            'course' => json_encode([$request->course]),
             'staff' => $request->user()->id,
             'brn' => $request->user()->getBrn->name,
             'agn' => $request->user()->getAgn->name,
@@ -78,7 +79,7 @@ class CustomerController extends Controller
             'province' => $request->prov,
             'dob' => $request->dob,
             'phone' => $request->phone,
-            'course' => $request->course
+            'course' => json_encode([$request->course]),
         ]);
 
         if ($request->pass) {
@@ -102,35 +103,40 @@ class CustomerController extends Controller
     }
 
     public function importData(Request $request) {
-        $datas = json_decode($request->data);
+        try {
+            $datas = json_decode($request->data);
 
-        foreach ($datas as $data) {
-            $cus = Customer::where('email', $data[7])->count();
-            $course = Course::where('name', $data[4])->first();
-            $last_course = Course::where('from', true)->orderBy('id', 'desc')->first();
-            if (!($course ?? false)) {
-                $course = Course::create([
-                    'code' => ($last_course ? $last_course->code + 1 : 0),
-                    'name' => $data[4],
-                ]);
+            foreach ($datas as $data) {
+                $cus = Customer::where('email', $data[7])->count();
+                $course = Course::where('name', $data[4])->first();
+                if (!($course ?? false)) {
+                    $course = Course::create([
+                        'code' => '',
+                        'name' => $data[4],
+                    ]);
+                    $course->code = $request->user()->getAgn->prefix . $course->id . date("Y");
+                    $course->save();
+                }
+                if (!($cus > 0)) {
+                    $cust = Customer::create([
+                        "name" => $data[0],
+                        "gender" => $data[1],
+                        "brn" => $request->user()->getBrn->name,
+                        "agn" => $request->user()->getAgn->name,
+                        "course" => json_encode([$course->id]),
+                        "phone" => $data[5],
+                        "address" => $data[6],
+                        "email" => $data[7],
+                        "password" => Hash::make($data[7]),
+                        'role' => 'customer'
+                    ]);
+                    $cust->assignRole('customer');
+                }
             }
-            if (!($cus > 0)) {
-                $cust = Customer::create([
-                    "name" => $data[0],
-                    "gender" => $data[1],
-                    "brn" => $data[3],
-                    "agn" => $data[2],
-                    "course" => $course ? $course->id : $data[4],
-                    "phone" => $data[5],
-                    "address" => $data[6],
-                    "email" => $data[7],
-                    "password" => Hash::make($data[7]),
-                    'role' => 'customer'
-                ]);
-                $cust->assignRole('customer');
-            }
+            return response()->json(['success' => "Data has been saved!", 'count' => count($datas ?? [])]);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()]);
         }
-        return response()->json(['success' => "Data has been saved!", 'count' => count($datas ?? [])]);
     }
 
     public function deletedCustomer() {

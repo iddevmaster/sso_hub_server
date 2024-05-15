@@ -39,7 +39,8 @@ class HomeController extends Controller
         }
 
         $user = auth()->user();
-        $courses_name = optional($user->getCourse)->name;
+        $course = Course::where('id', $user->course[0] ?? '')->first(['name']);
+        $courses_name = $course->name ?? '';
         // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
         if (strpos($courses_name, "รถยนต์") !== false) {
             $course_type = "car";
@@ -81,11 +82,15 @@ class HomeController extends Controller
     }
 
     public function dataTable() {
+        if (Auth::user()->hasRole('admin')) {
+            $courses = Course::all();
+        } else {
+            $courses = Course::where('agn', Auth::user()->agn)->get();
+        }
         $agns = Agency::all();
         $brns = Branch::all();
         $perms = Permission::all();
         $roles = Role::all();
-        $courses = Course::all();
 
         return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses'));
     }
@@ -101,13 +106,16 @@ class HomeController extends Controller
         if ($request->addType === 'agn') {
             Agency::create([
                 'name' => $request->agnname,
+                'prefix' => $request->prefix,
             ]);
         } elseif ($request->addType === 'course') {
-            $last_course = Course::where('from', 1)->orderBy('id', 'desc')->first();
-            Course::create([
-                'code' => ($last_course ? $last_course->code + 1 : 0),
+            $course = Course::create([
+                'code' => '',
                 'name' => $request->cname,
+                'agn' => $request->user()->agn,
             ]);
+            $course->code = $request->user()->getAgn->prefix . $course->id . date("Y");
+            $course->save();
         } elseif ($request->addType === 'brn') {
             Branch::create([
                 'name' => $request->bName,
@@ -125,6 +133,7 @@ class HomeController extends Controller
         if ($request->addType === 'agn') {
             Agency::find($request->eid)->update([
                 'name' => $request->agnname,
+                'prefix' => $request->prefix,
             ]);
         } elseif ($request->addType === 'course') {
             Course::find($request->eid)->update([
