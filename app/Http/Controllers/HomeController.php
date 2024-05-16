@@ -237,7 +237,11 @@ class HomeController extends Controller
     }
 
     public function customerTable() {
-        $customers = User::role('customer')->orderBy('id', 'desc')->get();
+        if (Auth::user()->hasRole('admin')) {
+            $customers = User::role('customer')->orderBy('id', 'desc')->get();
+        } else {
+            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->get();
+        }
         $courses = Course::orderBy('id', 'desc')->get();
         return view('pages.customer-table', compact('customers', 'courses'));
     }
