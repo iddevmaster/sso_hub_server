@@ -29,7 +29,10 @@
                                         <th class="text-start">{{ $user->email }}</th>
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
-                                        <td>{{ $user->course }}</td>
+                                        @php
+                                            $course_name = App\Models\Course::where('id', $user->course[0])->first(['name']);
+                                        @endphp
+                                        <td>{{ $course_name->name }}</td>
                                         <td >
                                             <button class="btn btn-sm btn-warning reuseBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Reuse"><i class="bi bi-recycle"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Delete permanently"><i class="bi bi-trash3"></i></button>
