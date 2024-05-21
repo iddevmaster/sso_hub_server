@@ -58,7 +58,8 @@
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
                                         @php
-                                            $course_name = App\Models\Course::where('id', $user->course[0])->first(['name']);
+                                            $courses_list = $user->course ?? [];
+                                            $course_name = App\Models\Course::where('id', end($courses_list))->first(['name']);
                                         @endphp
                                         <td>{{ $course_name->name }}</td>
                                         <td >
@@ -81,7 +82,16 @@
                                                             <div class="col"><b>Phone:</b> {{ $user->phone }}</div>
                                                             <div class="col-12"><b>Address:</b> {{ $user->address }}</div>
                                                             <div class="col-12"><b>Branch: </b> {{ $user->brn . ' / ' . $user->agn}}</div>
-                                                            <div class="col-12"><b>Course:</b> {{ $course_name->name }}</div>
+                                                            <div class="col-12"><b>Course:</b></div>
+                                                            @php
+                                                                $courses_list = $user->course ?? [];
+                                                            @endphp
+                                                            @foreach ($courses_list as $index => $course_id)
+                                                                @php
+                                                                    $courselist_name = App\Models\Course::where('id', $course_id)->first(['name']);
+                                                                @endphp
+                                                                <div class="col-12">{{ $index + 1 }} {{ $courselist_name->name }}</div>
+                                                            @endforeach
                                                         </div>
                                                     </div>
                                                 </div>

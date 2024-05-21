@@ -79,8 +79,17 @@ class CustomerController extends Controller
             'province' => $request->prov,
             'dob' => $request->dob,
             'phone' => $request->phone,
-            'course' => json_encode([$request->course]),
         ]);
+
+        $cus_course = $cust->course;
+        if (count($cus_course ?? []) > 0) {
+            if (!in_array($request->course, $cus_course)) {
+                $cus_course[] = $request->course;
+                $cust->course = json_encode($cus_course);
+            }
+        } else {
+            $cust->course = json_encode([$request->course]);
+        }
 
         if ($request->pass) {
             $request->validate([
@@ -90,8 +99,9 @@ class CustomerController extends Controller
                 'pass.min' => 'Password must be 8-13 character.',
             ]);
             $cust->password = Hash::make($request->pass);
-            $cust->save();
         }
+
+        $cust->save();
 
         return response()->json(['message' => $request->all()]);
     }
@@ -107,7 +117,7 @@ class CustomerController extends Controller
             $datas = json_decode($request->data);
 
             foreach ($datas as $data) {
-                $cus = Customer::where('email', $data[7])->count();
+                $cust = Customer::where('email', $data[7])->first();
                 $course = Course::where('name', $data[4])->first();
                 if (!($course ?? false)) {
                     $course = Course::create([
@@ -117,13 +127,12 @@ class CustomerController extends Controller
                     $course->code = $request->user()->getAgn->prefix . $course->id . date("Y");
                     $course->save();
                 }
-                if (!($cus > 0)) {
+                if (!($cust ?? false)) {
                     $cust = Customer::create([
                         "name" => $data[0],
                         "gender" => $data[1],
                         "brn" => $request->user()->getBrn->name,
                         "agn" => $request->user()->getAgn->name,
-                        "course" => json_encode([$course->id]),
                         "phone" => $data[5],
                         "address" => $data[6],
                         "email" => $data[7],
@@ -132,6 +141,17 @@ class CustomerController extends Controller
                     ]);
                     $cust->assignRole('customer');
                 }
+
+                $cus_course = $cust->course;
+                if (count($cus_course ?? []) > 0) {
+                    if (!in_array($course->id, $cus_course)) {
+                        $cus_course[] = $course->id;
+                        $cust->course = json_encode($cus_course);
+                    }
+                } else {
+                    $cust->course = json_encode([$course->id]);
+                }
+                $cust->save();
             }
             return response()->json(['success' => "Data has been saved!", 'count' => count($datas ?? [])]);
         } catch (\Throwable $th) {

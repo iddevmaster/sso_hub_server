@@ -17,6 +17,7 @@
                                 <tr class="table-dark">
                                     <th>Code</th>
                                     <th>Name</th>
+                                    <th>From</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -25,6 +26,26 @@
                                     <tr>
                                         <th>{{ $course->code }}</th>
                                         <td>{{ $course->name }}</td>
+                                        @php
+                                            switch ($course->from) {
+                                                case 1:
+                                                    $from = 'SSO';
+                                                    break;
+
+                                                case 2:
+                                                    $from = 'EM';
+                                                    break;
+
+                                                case 3:
+                                                    $from = 'POS';
+                                                    break;
+
+                                                default:
+                                                    $from = '-unknown-';
+                                                    break;
+                                            }
+                                        @endphp
+                                        <th>{{ $from }}</th>
                                         <td>
                                             <button class="btn btn-sm btn-warning editBtn" editType="course" value="{{ $course->name }}" editId="{{ $course->id }}"><i class="bi bi-gear"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" delType="course" delId="{{ $course->id }}"><i class="bi bi-trash3"></i></button>

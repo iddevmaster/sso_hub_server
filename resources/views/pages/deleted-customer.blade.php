@@ -30,7 +30,8 @@
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
                                         @php
-                                            $course_name = App\Models\Course::where('id', $user->course[0])->first(['name']);
+                                            $courses_list = $user->course ?? [];
+                                            $course_name = App\Models\Course::where('id', end($courses_list))->first(['name']);
                                         @endphp
                                         <td>{{ $course_name->name }}</td>
                                         <td >

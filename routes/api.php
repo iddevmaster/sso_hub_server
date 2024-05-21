@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
-    $course = App\Models\Course::where('id', $request->user()->course[0])->first(['code', 'name']);
+    $courses_list = $request->user()->course ?? [];
+    $course = App\Models\Course::where('id', end($courses_list))->first(['code', 'name']);
     $user_data = [
         "name" => $request->user()->name,
         "username" => $request->user()->email,
