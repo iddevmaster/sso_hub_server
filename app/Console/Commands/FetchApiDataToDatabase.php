@@ -65,6 +65,7 @@ class FetchApiDataToDatabase extends Command
     {
         echo "start process data and store dest: ". $apiDest ."\n";
         $agn = Agency::where('prefix', 'IDD')->first();
+        echo "agn: ". $agn->id ?? 'agn not found' ."\n";
         switch ($apiDest) {
             case 'idmskk':
                 $brn = Branch::where('name', 'โนนทัน')->first();
@@ -136,7 +137,7 @@ class FetchApiDataToDatabase extends Command
                 }
                 break;
         }
-        echo "Branch: " . $brn->name . " / " . $agn->name . "\n";
+        echo "Branch: " . $brn->name ?? 'brn name not found' . " / " . $agn->name ?? 'agn name not found' . "\n";
 
         foreach ($responseData as $dataItem) {
             $course = Course::where('code', $dataItem['course_code'])->first();
