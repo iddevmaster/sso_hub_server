@@ -63,7 +63,7 @@ class FetchApiDataToDatabase extends Command
      */
     private function processDataAndStore(array $responseData, $apiDest)
     {
-        echo "start process data and store\n";
+        echo "start process data and store dest: ". $apiDest ."\n";
         $agn = Agency::where('prefix', 'IDD')->first();
         switch ($apiDest) {
             case 'idmskk':
