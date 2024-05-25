@@ -29,7 +29,7 @@
                                 <input type="password" class="form-control @error('password') is-invalid @enderror"
                                     id="password" placeholder="Password" value="" name="password" required
                                     autocomplete="current-password">
-                                <label for="password">รหัสผ่าน</label>
+                                <label for="password">ยืนยันเลขบัตรประชาชน</label>
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
