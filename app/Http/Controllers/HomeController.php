@@ -42,6 +42,7 @@ class HomeController extends Controller
         $courses_list = $user->course ?? [];
         $course = Course::where('id', end($courses_list) ?? '')->first(['name']);
         $courses_name = $course->name ?? '';
+        $user_branch = $user->brn ?? '';
         // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
         if (strpos($courses_name, "รถยนต์") !== false) {
             $course_type = "car";
@@ -52,7 +53,22 @@ class HomeController extends Controller
         } else {
             $course_type = "car";
         }
-        return view('home', compact('course_type', 'user'));
+
+        if (strpos($user_branch, "พยัค") !== false) {
+            $send_branch = "idmsPY";
+        } elseif (strpos($user_branch, "สารคาม") !== false) {
+            $send_branch = "idmsMK";
+        } elseif (strpos($user_branch, "แก่งคอย") !== false) {
+            $send_branch = "idmsTK";
+        } elseif (strpos($user_branch, "ลำลูกกา") !== false) {
+            $send_branch = "idmsLLK";
+        } elseif (strpos($user_branch, "โปร") !== false) {
+            $send_branch = "idmsPRO";
+        } else {
+            $send_branch = "idmskk";
+        }
+
+        return view('home', compact('course_type', 'user', 'send_branch'));
     }
 
     public function toggleTheme($isDark) {
