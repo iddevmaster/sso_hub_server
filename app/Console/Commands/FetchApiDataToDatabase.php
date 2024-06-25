@@ -163,7 +163,7 @@ class FetchApiDataToDatabase extends Command
                             $customer = User::create([
                                 'email' => $student['student_identification_number'],
                                 'password' => Hash::make($student['student_identification_number']),
-                                'name' => $student['student_firstname_th'] . ($student['student_lastname_th'] ? ' ' . $student['student_lastname_th'] : '' ),
+                                'name' => $student['student_prefix_th'] . ($student['student_firstname_th'] ? ' ' . $student['student_lastname_th'] : '' ),
                                 'brn' => $brn->name,
                                 'agn' => $agn->name,
                                 'role' => 'customer'
