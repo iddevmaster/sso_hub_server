@@ -7,8 +7,10 @@
                 <div class="d-flex justify-content-between my-3">
                     <h1 class="text-center">Customers</h1>
                     <div class="d-flex gap-2">
+                        @role('staff')
                         <div class="d-flex"><button class="btn btn-success align-self-center addBtn" data-toggle="tooltip" title="Add Customer"><i class="bi bi-plus-square"></i></button></div>
-                        <div class="d-flex"><button class="btn btn-primary align-self-center importBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" title="Import from file"><i class="bi bi-arrow-down-square"></i></button></div>
+                        @endrole
+                        {{-- <div class="d-flex"><button class="btn btn-primary align-self-center importBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" title="Import from file"><i class="bi bi-arrow-down-square"></i></button></div> --}}
                         @role('admin')
                             <a class="d-flex" href="{{ route('deleted-customers') }}"><button class="btn btn-secondary align-self-center" data-toggle="tooltip" title="Deleted customers"><i class="bi bi-recycle"></i></button></a>
                         @endrole
@@ -54,8 +56,8 @@
                             <tbody>
                                 @foreach ($customers as $index => $user)
                                     <tr>
-                                        <th class="text-start">{{ $user->email }}</th>
-                                        <td>{{ $user->name }}</td>
+                                        <th class="text-start">{{ $user->username }}</th>
+                                        <td>{{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
                                         @php
                                             $courses_list = $user->course ?? [];
@@ -74,8 +76,8 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="row row-cols-2 text-wrap">
-                                                            <div class="col"><b>Citizen ID:</b> {{ $user->email }}</div>
-                                                            <div class="col"><b>Name:</b> {{ $user->name }}</div>
+                                                            <div class="col"><b>Citizen ID:</b> {{ $user->username }}</div>
+                                                            <div class="col"><b>Name:</b> {{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}</div>
                                                             <div class="col"><b>Gender:</b> {{ $user->gender }}</div>
                                                             <div class="col"><b>Province:</b> {{ $user->province }}</div>
                                                             <div class="col"><b>DoB:</b> {{ $user->dob }}</div>
@@ -239,8 +241,19 @@
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="13" id="pass" placeholder="* Password (8-13 digits)" required>
                         </div>
+                        <select class="form-select mb-3" aria-label="selectCourse" id="prefix">
+                            <option value="" selected disabled>Select Prefix</option>
+                            <option value="นาย" >นาย</option>
+                            <option value="นาง" >นาง</option>
+                            <option value="นางสาว" >นางสาว</option>
+                            <option value="Mr." >Mr.</option>
+                            <option value="Ms." >Ms.</option>
+                        </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="* Name">
+                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="*First Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" maxlength="100" id="lname" placeholder="*Last Name">
                         </div>
                         <select class="form-select mb-3" aria-label="selectCourse" id="gend">
                             <option value="" selected disabled>Select Gender</option>
@@ -271,7 +284,9 @@
                     preConfirm: () => {
                         const cid = document.getElementById("cid").value;
                         const pass = document.getElementById("pass").value;
+                        const prefix = document.getElementById("prefix").value;
                         const name = document.getElementById("name").value;
+                        const lname = document.getElementById("lname").value;
                         const gend = document.getElementById("gend").value;
                         const addr = document.getElementById("addr").value;
                         const prov = document.getElementById("prov").value;
@@ -285,7 +300,19 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { citizen_id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
+                                data: {
+                                    citizen_id:cid,
+                                    name:name,
+                                    lname:lname,
+                                    gend:gend,
+                                    pass:pass,
+                                    addr:addr,
+                                    prov:prov,
+                                    dob:dob,
+                                    course:course,
+                                    phone:phone,
+                                    prefix:prefix,
+                                },
                                 success: function (response) {
                                     console.log(response);
                                     Swal.fire({
@@ -325,13 +352,24 @@
                     title: 'Edit Customer',
                     html: `
                     <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="13" value="${custom.email}" id="cid" placeholder="* Citizen ID (1-13 digits)">
+                            <input type="text" class="form-control" maxlength="13" value="${custom.username}" id="cid" placeholder="* Citizen ID (1-13 digits)">
                         </div>
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="13" id="pass" placeholder="Password (8-13 digits) หากใช้รหัสผ่านเดิมไม่ต้องกรอก">
                         </div>
+                        <select class="form-select mb-3" aria-label="selectCourse" id="prefix">
+                            <option value="" selected disabled>Select Prefix</option>
+                            <option value="นาย" ${custom.prefix == 'นาย' ? 'selected' : ''}>นาย</option>
+                            <option value="นาง" ${custom.prefix == 'นาง' ? 'selected' : ''}>นาง</option>
+                            <option value="นางสาว" ${custom.prefix == 'นางสาว' ? 'selected' : ''}>นางสาว</option>
+                            <option value="Mr." ${custom.prefix == 'Mr.' ? 'selected' : ''}>Mr.</option>
+                            <option value="Ms." ${custom.prefix == 'Ms.' ? 'selected' : ''}>Ms.</option>
+                        </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${custom.name}" id="name" placeholder="* Name">
+                            <input type="text" class="form-control" maxlength="100" value="${custom.name }" id="name" placeholder="* Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" maxlength="100" id="lname" value="${custom.lname ?? ''}" placeholder="*Last Name">
                         </div>
                         <select class="form-select mb-3" aria-label="selectCourse" id="gend">
                             <option value="" selected disabled>Select Gender</option>
@@ -362,7 +400,9 @@
                     preConfirm: (agnName) => {
                         const cid = document.getElementById("cid").value;
                         const pass = document.getElementById("pass").value;
+                        const prefix = document.getElementById("prefix").value;
                         const name = document.getElementById("name").value;
+                        const lname = document.getElementById("lname").value;
                         const gend = document.getElementById("gend").value;
                         const addr = document.getElementById("addr").value;
                         const prov = document.getElementById("prov").value;
@@ -376,7 +416,20 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { oid:custom.id, id:cid, name:name, gend:gend, pass:pass, addr:addr, prov:prov, dob:dob, course:course, phone:phone},
+                                data: {
+                                    oid:custom.id,
+                                    id:cid,
+                                    name:name,
+                                    gend:gend,
+                                    pass:pass,
+                                    addr:addr,
+                                    prov:prov,
+                                    dob:dob,
+                                    course:course,
+                                    phone:phone,
+                                    lname:lname,
+                                    prefix:prefix,
+                                },
                                 success: function (response) {
                                     console.log(response);
                                     Swal.fire({

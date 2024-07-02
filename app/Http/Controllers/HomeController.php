@@ -201,7 +201,7 @@ class HomeController extends Controller
         $brn = Branch::find($request->brn);
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->uname,
+            'username' => $request->uname,
             'password' => Hash::make($request->pass),
             'brn' => $brn->id,
             'agn' => optional($brn->getAgn)->id,
@@ -223,7 +223,7 @@ class HomeController extends Controller
         $user = User::find($request->eid);
         $roles = Role::pluck('name');
         $user->name = $request->name;
-        $user->email = $request->uname;
+        $user->username = $request->uname;
         $user->brn = $brn->id;
         $user->agn = optional($brn->getAgn)->id;
 

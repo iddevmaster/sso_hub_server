@@ -16,7 +16,7 @@
                 <tr>
                     <th>{{ $index + 1 }}</th>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->username }}</td>
                     <td>{{ optional($user->getDpm)->name }}</td>
                     <td>{{ optional($user->getBrn)->name }}</td>
                     <td>{{ optional($user->getAgn)->name }}</td>

@@ -94,14 +94,16 @@ class FetchPOSDataToDatabase extends Command
             echo "Course: " . $course->code . " Student: " . count($dataItem['data']) . "\n";
             if (count($dataItem['data']) > 0) {
                 foreach ($dataItem['data'] as $student) {
-                    $customer = User::where('email', $student['student_identification_number'])->first();
+                    $customer = User::where('username', $student['student_identification_number'])->first();
 
                     if (!$customer) {
                         try {
                             $customer = User::create([
-                                'email' => $student['student_identification_number'],
+                                'username' => $student['student_identification_number'],
                                 'password' => Hash::make($student['student_identification_number']),
-                                'name' => $student['student_firstname_th'] . ($student['student_lastname_th'] ? ' ' . $student['student_lastname_th'] : '' ),
+                                'prefix' => $student['student_prefix_th'],
+                                'name' => $student['student_firstname_th'],
+                                'lname' => $student['student_lastname_th'],
                                 'brn' => $brn->name,
                                 'agn' => $agn->name,
                                 'role' => 'customer'
@@ -131,7 +133,7 @@ class FetchPOSDataToDatabase extends Command
                         echo "Update customer error: " . $th->getMessage() . "\n";
                     }
 
-                    echo "customer: " . $customer->email . "\n";
+                    echo "customer: " . $customer->username . "\n";
                 }
             }
             echo "Update data success!! \n";

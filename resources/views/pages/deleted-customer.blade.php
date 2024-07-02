@@ -26,7 +26,7 @@
                             <tbody>
                                 @foreach ($customers as $index => $user)
                                     <tr>
-                                        <th class="text-start">{{ $user->email }}</th>
+                                        <th class="text-start">{{ $user->username }}</th>
                                         <td>{{ $user->name }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
                                         @php

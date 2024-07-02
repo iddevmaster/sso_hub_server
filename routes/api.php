@@ -21,7 +21,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
     $course = App\Models\Course::where('id', end($courses_list))->first(['code', 'name']);
     $user_data = [
         "name" => $request->user()->name,
-        "username" => $request->user()->email,
+        "username" => $request->user()->username,
         "role" => $request->user()->role,
         "course_code" => $course->code,
         "course_name" => $course->name,

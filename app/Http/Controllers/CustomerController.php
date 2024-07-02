@@ -34,7 +34,7 @@ class CustomerController extends Controller
 
     public function storeCustomer(Request $request) {
         $request->validate([
-            'citizen_id' => 'required|unique:users,email|max:255',
+            'citizen_id' => 'required|unique:users,username|max:255',
             'name' => 'required|max:255',
             'pass' => 'required|max:13|min:8',
             'course' => 'required',
@@ -44,9 +44,11 @@ class CustomerController extends Controller
             'pass.min' => 'Password must be 8-13 character.',
         ]);
         $cust = Customer::create([
-            'email' => $request->citizen_id,
+            'username' => $request->citizen_id,
             'password' => Hash::make($request->pass),
+            'prefix' => $request->prefix,
             'name' => $request->name,
+            'lname' => $request->lname,
             'gender' => $request->gend,
             'address' => $request->addr,
             'province' => $request->prov,
@@ -72,8 +74,10 @@ class CustomerController extends Controller
 
         $cust = Customer::find($request->oid);
         $cust->update([
-            'email' => $request->id,
+            'username' => $request->id,
+            'prefix' => $request->prefix,
             'name' => $request->name,
+            'lname' => $request->lname,
             'gender' => $request->gend,
             'address' => $request->addr,
             'province' => $request->prov,
@@ -117,7 +121,7 @@ class CustomerController extends Controller
             $datas = json_decode($request->data);
 
             foreach ($datas as $data) {
-                $cust = Customer::where('email', $data[7])->first();
+                $cust = Customer::where('username', $data[7])->first();
                 $course = Course::where('name', $data[4])->first();
                 if (!($course ?? false)) {
                     $course = Course::create([
@@ -135,7 +139,7 @@ class CustomerController extends Controller
                         "agn" => $request->user()->getAgn->name,
                         "phone" => $data[5],
                         "address" => $data[6],
-                        "email" => $data[7],
+                        "username" => $data[7],
                         "password" => Hash::make($data[7]),
                         'role' => 'customer'
                     ]);

@@ -15,11 +15,11 @@
                             @csrf
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control @error('email') is-invalid @enderror"
-                                    value="" name="email" required autofocus autocomplete="email" id="email"
+                                <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                    value="" name="username" required autofocus autocomplete="username" id="username"
                                     placeholder="Username">
-                                <label for="email">เลขบัตรประชาชน</label>
-                                @error('email')
+                                <label for="username">เลขบัตรประชาชน</label>
+                                @error('username')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
