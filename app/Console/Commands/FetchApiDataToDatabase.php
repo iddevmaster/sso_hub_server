@@ -65,75 +65,121 @@ class FetchApiDataToDatabase extends Command
     private function processDataAndStore(array $responseData, $apiDest)
     {
         echo "start process data and store dest: ". $apiDest ."\n";
-        $agn = Agency::where('prefix', 'IDD')->first();
+        $agn = Agency::where('prefix', 'IDD')->orWhere('agn_id', "IDD0002")->orWhere('name', "โรงเรียนสอนขับรถ ไอดี ไดร์ฟเวอร์")->first();
+        if (!$agn) {
+            $agn = Agency::create([
+                'prefix' => 'IDD',
+                'agn_id' => 'IDD0002',
+                'name' => 'โรงเรียนสอนขับรถ ไอดี ไดร์ฟเวอร์',
+            ]);
+        } else {
+            $agn->update([
+                'agn_id' => 'IDD0002',
+            ]);
+        }
         echo "agn: ". $agn->id ?? 'agn not found' ."\n";
         switch ($apiDest) {
             case 'idmskk':
-                $brn = Branch::where('name', 'โนนทัน')->first();
+                $brn = Branch::where('name', 'โนนทัน')->orWhere('brn_id', 'IDD0003')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'โนนทัน',
+                        'brn_id' => 'IDD0003', // 'IDD0003' is the branch id for 'โนนทัน
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0003"
                     ]);
                 }
                 break;
 
             case 'idmsLLK':
-                $brn = Branch::where('name', 'ลำลูกกา')->first();
+                $brn = Branch::where('name', 'ลำลูกกา')->orWhere('brn_id', 'IDD0004')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'ลำลูกกา',
+                        'brn_id' => 'IDD0004',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0004"
                     ]);
                 }
                 break;
 
             case 'idmsMK':
-                $brn = Branch::where('name', 'มหาสารคาม')->first();
+                $brn = Branch::where('name', 'มหาสารคาม')->orWhere('brn_id', 'IDD0005')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'มหาสารคาม',
+                        'brn_id' => 'IDD0005',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0005"
                     ]);
                 }
                 break;
 
             case 'idmsPRO':
-                $brn = Branch::where('name', 'เดอะโปรเฟชชั่นแนล')->first();
+                $brn = Branch::where('name', 'เดอะโปรเฟชชั่นแนล')->orWhere('brn_id', 'IDD0006')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'เดอะโปรเฟชชั่นแนล',
+                        'brn_id' => 'IDD0006',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0006"
                     ]);
                 }
                 break;
 
             case 'idmsPY':
-                $brn = Branch::where('name', 'พยัคฆภูมิพิสัย')->first();
+                $brn = Branch::where('name', 'พยัคฆภูมิพิสัย')->orWhere('brn_id', 'IDD0002')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'พยัคฆภูมิพิสัย',
+                        'brn_id' => 'IDD0002',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0002"
                     ]);
                 }
                 break;
 
             case 'idmsTK':
-                $brn = Branch::where('name', 'แก่งคอย')->first();
+                $brn = Branch::where('name', 'แก่งคอย')->orWhere('brn_id', 'IDD0007')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'แก่งคอย',
+                        'brn_id' => 'IDD0007',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0007"
                     ]);
                 }
                 break;
 
             default:
-                $brn = Branch::where('name', 'โนนทัน')->first();
+                $brn = Branch::where('name', 'โนนทัน')->orWhere('brn_id', 'IDD0003')->first();
                 if (!$brn) {
                     $brn = Branch::create([
                         'name' => 'โนนทัน',
+                        'brn_id' => 'IDD0003',
                         'agn' => $agn->id,
+                    ]);
+                } else {
+                    $brn->update([
+                        'brn_id' => "IDD0003"
                     ]);
                 }
                 break;
@@ -148,12 +194,17 @@ class FetchApiDataToDatabase extends Command
                         'code' => $dataItem['course_code'],
                         'name' => $dataItem['course_name_th'],
                         'from' => 2,
-                        'agn' => $agn->id,
+                        'agn' => $agn->agn_id,
                     ]);
                 } catch (\Throwable $th) {
                     echo "Create course error: " . $th->getMessage() . "\n";
                 }
+            } else {
+                $course->update([
+                    'agn' => $agn->agn_id,
+                ]);
             }
+
             echo "Course: " . $course->code . "\n";
             if (count($dataItem['data']) > 0) {
                 foreach ($dataItem['data'] as $student) {
@@ -167,8 +218,8 @@ class FetchApiDataToDatabase extends Command
                                 'prefix' => $student['student_prefix_th'],
                                 'name' => $student['student_firstname_th'],
                                 'lname' => $student['student_lastname_th'],
-                                'brn' => $brn->name,
-                                'agn' => $agn->name,
+                                'brn' => $brn->brn_id,
+                                'agn' => $agn->agn_id,
                                 'role' => 'customer'
                             ]);
                         } catch (\Throwable $th) {
