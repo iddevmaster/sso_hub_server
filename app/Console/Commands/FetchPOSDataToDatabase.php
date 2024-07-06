@@ -62,18 +62,28 @@ class FetchPOSDataToDatabase extends Command
     private function processDataAndStore(array $responseData)
     {
         echo "start process data and store\n";
-        $agn = Agency::where('prefix', 'TZ')->first();
+        $agn = Agency::where('prefix', 'TZ')->orWhere('agn_id', "TZ0003")->orWhere('name', "TrainingZenter")->first();
         if (!$agn) {
             $agn = Agency::create([
                 'name' => 'TrainingZenter',
+                'agn_id' => "TZ0003",
                 'prefix' => 'TZ',
             ]);
+        } else {
+            $agn->update([
+                'agn_id' => 'TZ0003',
+            ]);
         }
-        $brn = Branch::where('name', 'TrainingZenter')->first();
+        $brn = Branch::where('name', 'TrainingZenter')->orWhere('brn_id', 'TZ0008')->first();
         if (!$brn) {
             $brn = Branch::create([
                 'name' => 'TrainingZenter',
+                'brn_id' => 'TZ0008',
                 'agn' => $agn->id,
+            ]);
+        } else {
+            $brn->update([
+                'brn_id' => "TZ0008"
             ]);
         }
         echo "Branch: " . $brn->name . " / " . $agn->name . "\n";
@@ -105,8 +115,8 @@ class FetchPOSDataToDatabase extends Command
                                 'prefix' => $student['student_prefix_th'],
                                 'name' => $student['student_firstname_th'],
                                 'lname' => $student['student_lastname_th'],
-                                'brn' => $brn->name,
-                                'agn' => $agn->name,
+                                'brn' => $brn->brn_id,
+                                'agn' => $agn->agn_id,
                                 'role' => 'customer'
                             ]);
                         } catch (\Throwable $th) {
