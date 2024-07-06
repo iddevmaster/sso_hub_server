@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agency;
 use App\Models\Branch;
 use App\Models\Course;
+use App\Models\CourseType;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -108,8 +109,9 @@ class HomeController extends Controller
         $brns = Branch::all();
         $perms = Permission::all();
         $roles = Role::all();
+        $course_type = CourseType::all();
 
-        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses'));
+        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses', 'course_type'));
     }
 
     public function permTable() {
@@ -130,6 +132,7 @@ class HomeController extends Controller
                 'code' => '',
                 'name' => $request->cname,
                 'agn' => $request->user()->agn,
+                'course_type' => $request->ctype,
             ]);
             $course->code = $request->user()->getAgn->prefix . $course->id . date("Y");
             $course->save();
@@ -142,6 +145,10 @@ class HomeController extends Controller
             Permission::create(['name' => $request->permName]);
         } elseif ($request->addType === 'role') {
             Role::create(['name' => $request->roleName]);
+        } elseif ($request->addType === 'ctype') {
+            $coursetype = CourseType::create(['name' => $request->typename, 'code' => '']);
+            $coursetype->code = date("Y") . sprintf("%04d", $coursetype->id);
+            $coursetype->save();
         }
         return response()->json(['message' => $request->all()]);
     }
@@ -155,11 +162,16 @@ class HomeController extends Controller
         } elseif ($request->addType === 'course') {
             Course::find($request->eid)->update([
                 'name' => $request->cname,
+                'course_type' => $request->ctype,
             ]);
         } elseif ($request->addType === 'brn') {
             Branch::find($request->eid)->update([
                 'name' => $request->bName,
                 'agn' => $request->bAgn,
+            ]);
+        } elseif ($request->addType === 'ctype') {
+            CourseType::find($request->eid)->update([
+                'name' => $request->typename,
             ]);
         }
         return response()->json(['message' => $request->all()]);
@@ -170,6 +182,8 @@ class HomeController extends Controller
             Agency::find($request->delid)->delete();
         } elseif ($request->deltype === 'course') {
             Course::find($request->delid)->delete();
+        } elseif ($request->deltype === 'ctype') {
+            CourseType::find($request->delid)->delete();
         } elseif ($request->deltype === 'brn') {
             Branch::find($request->delid)->delete();
         } elseif ($request->deltype === 'perm') {
@@ -200,7 +214,9 @@ class HomeController extends Controller
     public function storeUser(Request $request) {
         $brn = Branch::find($request->brn);
         $user = User::create([
+            'prefix' => $request->prefix,
             'name' => $request->name,
+            'lname' => $request->lname,
             'username' => $request->uname,
             'password' => Hash::make($request->pass),
             'brn' => $brn->id,
@@ -222,7 +238,9 @@ class HomeController extends Controller
         $brn = Branch::find($request->brn);
         $user = User::find($request->eid);
         $roles = Role::pluck('name');
+        $user->prefix = $request->prefix;
         $user->name = $request->name;
+        $user->lname = $request->lname;
         $user->username = $request->uname;
         $user->brn = $brn->id;
         $user->agn = optional($brn->getAgn)->id;

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User_has_course;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use App\Models\Agency;
@@ -114,14 +115,25 @@ class FetchPOSDataToDatabase extends Command
                     }
 
                     try {
-                        $cus_course = $customer->course;
-                        if (count($cus_course ?? []) > 0) {
-                            if (!in_array($course->id, $cus_course)) {
-                                $cus_course[] = $course->id;
-                                $customer->course = json_encode($cus_course);
-                            }
+                        // $cus_course = $customer->course;
+                        // if (count($cus_course ?? []) > 0) {
+                        //     if (!in_array($course->id, $cus_course)) {
+                        //         $cus_course[] = $course->id;
+                        //         $customer->course = json_encode($cus_course);
+                        //     }
+                        // } else {
+                        //     $customer->course = json_encode([$course->id]);
+                        // }
+
+                        $user_has_course = User_has_course::where('user_id', $customer->id)->where('course_id', $course->id)->count();
+                        if (!$user_has_course) {
+                            User_has_course::create([
+                                'user_id' => $customer->id,
+                                'course_id' => $course->id
+                            ]);
+                            echo "Create User_has_course success!! \n";
                         } else {
-                            $customer->course = json_encode([$course->id]);
+                            echo "User " . $customer->id . "and course " . $course->id . " has exist \n";
                         }
 
                         if (!$customer->hasRole('customer')) {

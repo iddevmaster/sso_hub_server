@@ -17,6 +17,7 @@
                                 <tr class="table-dark">
                                     <th>Code</th>
                                     <th>Name</th>
+                                    <th>Type</th>
                                     <th>From</th>
                                     <th>Action</th>
                                 </tr>
@@ -26,6 +27,7 @@
                                     <tr>
                                         <th>{{ $course->code }}</th>
                                         <td>{{ $course->name }}</td>
+                                        <td>{{ optional($course->getTypeName())->name }}</td>
                                         @php
                                             switch ($course->from) {
                                                 case 1:
@@ -47,8 +49,42 @@
                                         @endphp
                                         <th>{{ $from }}</th>
                                         <td>
-                                            <button class="btn btn-sm btn-warning editBtn" editType="course" value="{{ $course->name }}" editId="{{ $course->id }}"><i class="bi bi-gear"></i></button>
+                                            <button class="btn btn-sm btn-warning editBtn" editType="course" value="{{ $course->name }}" courseType="{{ $course->course_type }}" editId="{{ $course->id }}"><i class="bi bi-gear"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" delType="course" delId="{{ $course->id }}"><i class="bi bi-trash3"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 mb-4">
+                <div class="d-flex justify-content-between">
+                    <h1 class="text-center my-3">Course Type</h1>
+                    <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="ctype">Add</button></div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <table class="table table-hover display nowrap w-100" id="agnTable">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($course_type as $index => $ctype)
+                                    <tr>
+                                        <th>{{ $index + 1 }}</th>
+                                        <td>{{ $ctype->name }}</td>
+                                        <td>{{ $ctype->code }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning editBtn" editType="ctype" value="{{ $ctype->name }}" editId="{{ $ctype->id }}"><i class="bi bi-gear"></i></button>
+                                            <button class="btn btn-sm btn-danger delBtn" delType="ctype" delId="{{ $ctype->id }}"><i class="bi bi-trash3"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -92,6 +128,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
                     <h1 class="text-center my-3">Branches</h1>
@@ -257,18 +294,25 @@
                             <div class="mb-3">
                                 <input type="text" maxlength="100" class="form-control" maxlength="100" id="cname" placeholder="Course name">
                             </div>
+                            <select class="form-select" aria-label="Default select example" id="ctype">
+                                <option value="" selected disabled>Select type</option>
+                                @foreach ($course_type as $ctype)
+                                    <option value="{{ $ctype->code }}">{{ $ctype->name }}</option>
+                                @endforeach
+                            </select>
                         `,
                         showCancelButton: true,
                         preConfirm: () => {
                             const cname = document.getElementById("cname").value;
-                            if (cname) {
+                            const ctype = document.getElementById("ctype").value;
+                            if (cname && ctype) {
                                 $.ajax({
                                     url: "/data/add",
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
-                                    data: { addType:atype, cname:cname},
+                                    data: { addType:atype, cname:cname, ctype: ctype},
                                     success: function (response) {
                                         // console.log(response);
                                         Swal.fire({
@@ -453,12 +497,62 @@
                         showLoaderOnConfirm: true,
                         allowOutsideClick: () => !Swal.isLoading()
                     });
+                } else if (atype === 'ctype') {
+                    Swal.fire({
+                        title: 'Course Type',
+                        html: `
+                            <input id="typename" class="swal2-input" placeholder="Enter course type">
+                        `,
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const typename = document.getElementById("typename").value;
+                            if (typename) {
+                                $.ajax({
+                                    url: "/data/add",
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: { addType:atype ,typename:typename},
+                                    success: function (response) {
+                                        // console.log(response);
+                                        Swal.fire({
+                                            title: "Success",
+                                            // text: "That thing is still around?",
+                                            icon: "success"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: (error) => {
+                                        // console.log(error);
+                                        Swal.fire({
+                                            title: "Sorry!",
+                                            text: "Something wrong!",
+                                            icon: "error"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                Swal.showValidationMessage(`Please enter input.`);
+                            }
+                        },
+                        showLoaderOnConfirm: true,
+                        allowOutsideClick: () => !Swal.isLoading()
+                    });
                 }
             });
 
             $(document).on("click", ".editBtn", function() {
                 const edittype = $(this).attr("editType");
                 const editId = $(this).attr("editId");
+                const courseType = $(this).attr("courseType");
                 const name = $(this).val();
                 if (edittype === 'agn') {
                     const eprefix = $(this).attr("eprefix");
@@ -519,18 +613,25 @@
                             <div class="mb-3">
                                 <input type="text" maxlength="100" value="${name}" class="form-control" maxlength="100" id="cname" placeholder="Course name">
                             </div>
+                            <select class="form-select" aria-label="Default select example" id="ctype">
+                                <option value="" selected disabled>Select type</option>
+                                @foreach ($course_type as $courset)
+                                    <option value="{{ $courset->code }}" ${courseType == {{ $courset->code }} ? 'selected' : ''}>{{ $courset->name }}</option>
+                                @endforeach
+                            </select>
                         `,
                         showCancelButton: true,
                         preConfirm: () => {
                             const cname = document.getElementById("cname").value;
-                            if (cname) {
+                            const ctype = document.getElementById("ctype").value;
+                            if (cname && ctype) {
                                 $.ajax({
                                     url: "/data/update",
                                     method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
-                                    data: { addType:edittype, cname:cname, eid:editId},
+                                    data: { addType:edittype, cname:cname, eid:editId, ctype: ctype},
                                     success: function (response) {
                                         // console.log(response);
                                         Swal.fire({
@@ -590,6 +691,56 @@
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
                                     data: { addType:edittype, bName:bname, bAgn: bagn, eid:editId},
+                                    success: function (response) {
+                                        // console.log(response);
+                                        Swal.fire({
+                                            title: "Success",
+                                            // text: "That thing is still around?",
+                                            icon: "success"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: (error) => {
+                                        // console.log(error);
+                                        Swal.fire({
+                                            title: "Sorry!",
+                                            text: "Something wrong!",
+                                            icon: "error"
+                                        }).then((res) => {
+                                            if (res.isConfirmed) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                Swal.showValidationMessage(`Please enter name and select agency.`);
+                            }
+                        },
+                        showLoaderOnConfirm: true,
+                        allowOutsideClick: () => !Swal.isLoading()
+                    });
+                } else if (edittype === 'ctype') {
+                    const agnid = $(this).attr("aid");
+                    Swal.fire({
+                        title: 'Course type',
+                        html: `
+                            <input id="typename" class="swal2-input" value="${name}" placeholder="Enter course type">
+                        `,
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const typename = document.getElementById("typename").value;
+                            if (typename) {
+                                $.ajax({
+                                    url: "/data/update",
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: { addType:edittype, typename:typename, eid:editId},
                                     success: function (response) {
                                         // console.log(response);
                                         Swal.fire({

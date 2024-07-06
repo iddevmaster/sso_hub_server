@@ -26,13 +26,13 @@
                                 @foreach ($users as $index => $user)
                                     <tr>
                                         <th>{{ $index + 1 }}</th>
-                                        <td>{{ $user->name }}</td>
+                                        <td>{{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}</td>
                                         <td>{{ $user->username }}</td>
                                         <td>{{ optional($user->getBrn)->name }}</td>
                                         <td>{{ optional($user->getAgn)->name }}</td>
                                         <td>{{ $user->role ?? '-' }}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-warning editBtn" eid="{{ $user->id }}" erole="{{ $user->role }}" editName="{{ $user->name }}" editUname="{{ $user->username }}" value="{{ $user->brn }}"><i class="bi bi-gear"></i></button>
+                                            <button class="btn btn-sm btn-warning editBtn" eid="{{ $user->id }}" erole="{{ $user->role }}" editPrefix="{{ $user->prefix }}" editlName="{{ $user->lname }}" editName="{{ $user->name }}" editUname="{{ $user->username }}" value="{{ $user->brn }}"><i class="bi bi-gear"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" value="{{ $user->id }}"><i class="bi bi-trash3"></i></button>
                                         </td>
                                     </tr>
@@ -50,8 +50,19 @@
                 Swal.fire({
                     title: 'Add User',
                     html: `
+                        <select class="form-select mb-3" aria-label="selectCourse" id="prefix">
+                            <option value="" selected disabled>Select Prefix</option>
+                            <option value="นาย" >นาย</option>
+                            <option value="นาง" >นาง</option>
+                            <option value="นางสาว" >นางสาว</option>
+                            <option value="Mr." >Mr.</option>
+                            <option value="Ms." >Ms.</option>
+                        </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="Name">
+                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="*First Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" maxlength="100" id="lname" placeholder="*Last Name">
                         </div>
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="100" id="uname" placeholder="Username">
@@ -74,7 +85,9 @@
                     `,
                     showCancelButton: true,
                     preConfirm: () => {
+                        const prefix = document.getElementById("prefix").value;
                         const name = document.getElementById("name").value;
+                        const lname = document.getElementById("lname").value;
                         const uname = document.getElementById("uname").value;
                         const pass = document.getElementById("pass").value;
                         const brn = document.getElementById("brn").value;
@@ -86,7 +99,7 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { name:name, uname:uname, pass:pass, brn:brn, role:role},
+                                data: { name:name, uname:uname, pass:pass, brn:brn, role:role, lname:lname, prefix:prefix},
                                 success: function (response) {
                                     // console.log(response);
                                     Swal.fire({
@@ -122,19 +135,32 @@
             });
 
             $(".editBtn").click(function() {
-                const name = $(this).attr("editName");
-                const uname = $(this).attr("editUname");
+                const ename = $(this).attr("editName");
+                const elname = $(this).attr("editlName");
+                const eprefix = $(this).attr("editPrefix");
+                const euname = $(this).attr("editUname");
                 const eid = $(this).attr("eid");
                 const erole = $(this).attr("erole");
-                const brn = $(this).val();
+                const ebrn = $(this).val();
                 Swal.fire({
                     title: 'Agency',
                     html: `
+                        <select class="form-select mb-3" aria-label="selectCourse" id="prefix">
+                            <option value="" selected disabled>Select Prefix</option>
+                            <option value="นาย" ${eprefix == 'นาย' ? 'selected' : ''}>นาย</option>
+                            <option value="นาง" ${eprefix == 'นาง' ? 'selected' : ''}>นาง</option>
+                            <option value="นางสาว" ${eprefix == 'นางสาว' ? 'selected' : ''}>นางสาว</option>
+                            <option value="Mr." ${eprefix == 'Mr.' ? 'selected' : ''}>Mr.</option>
+                            <option value="Ms." ${eprefix == 'Ms.' ? 'selected' : ''}>Ms.</option>
+                        </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${name}" id="name" placeholder="Name">
+                            <input type="text" class="form-control" maxlength="100" value="${ename}" id="name" placeholder="*First Name">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" value="${uname}" id="uname" placeholder="Username">
+                            <input type="text" class="form-control" maxlength="100" id="lname" value="${elname}" placeholder="*Last Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" maxlength="100" value="${euname}" id="uname" placeholder="Username">
                         </div>
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="100" id="pass" placeholder="Password (หากใช้รหัสเดิมไม่ต้องกรอก)">
@@ -142,7 +168,7 @@
                         <select class="form-select mb-3" aria-label="Default select example" id="brn">
                             <option value="" selected disabled>Select department</option>
                             @foreach ($brns as $brn)
-                                <option value="{{ $brn->id }}" ${brn == "{{ $brn->id }}" ? 'selected' : ''}>{{ $brn->name }}</option>
+                                <option value="{{ $brn->id }}" ${ebrn == "{{ $brn->id }}" ? 'selected' : ''}>{{ $brn->name }}</option>
                             @endforeach
                         </select>
                         <select class="form-select" aria-label="selectRole" id="role">
@@ -154,7 +180,9 @@
                     `,
                     showCancelButton: true,
                     preConfirm: (agnName) => {
+                        const prefix = document.getElementById("prefix").value;
                         const name = document.getElementById("name").value;
+                        const lname = document.getElementById("lname").value;
                         const uname = document.getElementById("uname").value;
                         const pass = document.getElementById("pass").value;
                         const brn = document.getElementById("brn").value;
@@ -166,7 +194,7 @@
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
-                                data: { name:name, uname:uname, pass:pass, brn:brn, eid:eid, role:role},
+                                data: { name:name, uname:uname, pass:pass, brn:brn, eid:eid, role:role, prefix:prefix, lname:lname},
                                 success: function (response) {
                                     // console.log(response);
                                     Swal.fire({

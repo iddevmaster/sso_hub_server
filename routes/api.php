@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Agency;
+use App\Models\Branch;
 use App\Models\Course;
+use App\Models\CourseType;
+use App\Models\User_has_course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -17,16 +21,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
-    $courses_list = $request->user()->course ?? [];
-    $course = App\Models\Course::where('id', end($courses_list))->first(['code', 'name']);
+    $courses_list = User_has_course::where('user_id', $request->user()->id)->get(['course_id']);
+    $agn = Agency::where('agn_id', $request->user()->agn)->first(['name', 'agn_id']);
+    $brn = Branch::where('brn_id', $request->user()->brn)->first(['name', 'brn_id']);
+    // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
+    $courses = DB::table('courses')
+                ->join('course_types', 'courses.course_type', '=', 'course_types.code')
+                ->select('courses.course_type', 'course_types.name')
+                ->whereIn('courses.id', $courses_list)
+                ->get();
     $user_data = [
-        "name" => $request->user()->name,
+        "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
         "username" => $request->user()->username,
         "role" => $request->user()->role,
-        "course_code" => $course->code,
-        "course_name" => $course->name,
-        "branch" => $request->user()->brn,
-        "agency" => $request->user()->agn,
+        "courses" => $courses,
+        "branch" => $brn,
+        "agency" => $agn,
     ];
     return $user_data;
 });
@@ -74,3 +84,7 @@ Route::middleware('auth.basic')->get('/courses', function () {
     return $res;
 });
 
+Route::withoutMiddleware('auth.basic')->get('/courseType', function () {
+    $courses = CourseType::get(['code', 'name']);
+    return $courses;
+});

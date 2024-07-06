@@ -78,7 +78,10 @@
                                             </div>
                                             <div class="">
                                                 <h5 class="mb-0">{{ auth()->user()->name }}</h5>
-                                                <p class="mb-0" style="max-width: 200px;">สาขา: {{ auth()->user()->getBrn ? auth()->user()->getBrn->name : auth()->user()->brn }}</p>
+                                                @php
+                                                    $brn = App\Models\Branch::where('brn_id', auth()->user()->brn)->first();
+                                                @endphp
+                                                <p class="mb-0" style="max-width: 200px;">สาขา: {{ $brn->name }}</p>
                                             </div>
                                         </div>
                                     </button>

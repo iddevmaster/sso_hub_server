@@ -14,6 +14,7 @@ class Branch extends Model
         'agn',
         'address',
         'contact',
+        'brn_id'
     ];
 
     public function getAgn() {

@@ -41,6 +41,19 @@
                         </div>
                     </div>
                 </div>
+
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        ขออภัย! มีบางอย่างผิดพลาด
+                    </div>
+                @endif
+
                 <div class="card shadow-sm">
                     <div class="card-body table-responsive">
                         <table class="table table-hover display nowrap" id="customerTable" style="width:100%;">
@@ -60,11 +73,22 @@
                                         <td>{{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}</td>
                                         <td class="text-start">{{ $user->brn }}</td>
                                         @php
-                                            $courses_list = $user->course ?? [];
-                                            $course_name = App\Models\Course::where('id', end($courses_list))->first(['name']);
+                                            $user_courses = App\Models\User_has_course::where('user_id', $user->id)->get();
                                         @endphp
-                                        <td>{{ $course_name->name }}</td>
+                                        <td>
+                                            <ol>
+                                                @foreach ($user_courses as $course)
+                                                    <li>
+                                                        <div>
+                                                            {{ optional($course->getCourse)->name }}
+                                                            <a href="#" class="remBtn" uid="{{ $course->user_id }}" cid="{{ $course->course_id }}"><i class="bi bi-x"></i></a>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ol>
+                                        </td>
                                         <td >
+                                            {{-- User detail modal --}}
                                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#userdetail{{ $index }}" data-toggle="tooltip" title="Detail"><i class="bi bi-person-vcard"></i></button>
                                             <!-- Modal -->
                                             <div class="modal fade" id="userdetail{{ $index }}" tabindex="-1" aria-labelledby="userdetail{{ $index }}Label" aria-hidden="true">
@@ -85,20 +109,46 @@
                                                             <div class="col-12"><b>Address:</b> {{ $user->address }}</div>
                                                             <div class="col-12"><b>Branch: </b> {{ $user->brn . ' / ' . $user->agn}}</div>
                                                             <div class="col-12"><b>Course:</b></div>
-                                                            @php
-                                                                $courses_list = $user->course ?? [];
-                                                            @endphp
-                                                            @foreach ($courses_list as $index => $course_id)
-                                                                @php
-                                                                    $courselist_name = App\Models\Course::where('id', $course_id)->first(['name']);
-                                                                @endphp
-                                                                <div class="col-12">{{ $index + 1 }} {{ $courselist_name->name }}</div>
+                                                            @foreach ($user_courses as $index => $course)
+                                                                <div class="col-12 ms-3">{{ $index + 1 }}. {{ optional($course->getCourse)->name }}</div>
                                                             @endforeach
                                                         </div>
                                                     </div>
                                                 </div>
                                                 </div>
                                             </div>
+
+                                            {{-- Add course modal --}}
+                                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCourse{{ $index }}" data-toggle="tooltip" title="เพิ่มหลักสูตร"><i class="bi bi-file-earmark-plus"></i></button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="addCourse{{ $index }}" tabindex="-1" aria-labelledby="addCourse{{ $index }}Label" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="staticBackdropLabel">เพิ่มหลักสูตร</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <form action="{{ route('customer-add-course', ['uid' => $user->id]) }}" method="post">
+                                                            @csrf
+
+                                                            <div class="modal-body">
+                                                                <label for="courseSelect" class="form-label">เลือกหลักสูตร</label>
+                                                                <select id="courseSelect" name="courseSelect" class="form-select" aria-label="Default select example" required>
+                                                                    <option selected disabled>กรุณาเลือกหลักสูตรที่ต้องการเพิ่ม</option>
+                                                                    @foreach ($courses as $course)
+                                                                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                                                                <button type="submit" class="btn btn-primary">บันทึก</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <button class="btn btn-sm btn-warning editBtn" custom="{{ $user }}" data-toggle="tooltip" title="Edit"><i class="bi bi-gear"></i></button>
                                             <button class="btn btn-sm btn-danger delBtn" value="{{ $user->id }}" data-toggle="tooltip" title="Delete"><i class="bi bi-trash3"></i></button>
                                         </td>
@@ -273,12 +323,6 @@
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="100" id="phone" placeholder="Phone">
                         </div>
-                        <select class="form-select" aria-label="selectCourse" id="course">
-                            <option value="" selected disabled>* Select course</option>
-                            @foreach ($courses ?? [] as $course)
-                                <option value="{{ $course->id }}">{{ $course->name }}</option>
-                            @endforeach
-                        </select>
                     `,
                     showCancelButton: true,
                     preConfirm: () => {
@@ -291,9 +335,8 @@
                         const addr = document.getElementById("addr").value;
                         const prov = document.getElementById("prov").value;
                         const dob = document.getElementById("dob").value;
-                        const course = document.getElementById("course").value;
                         const phone = document.getElementById("phone").value;
-                        if (cid && pass && name && course) {
+                        if (cid && pass && name) {
                             $.ajax({
                                 url: "/customer/store",
                                 method: 'POST',
@@ -309,7 +352,6 @@
                                     addr:addr,
                                     prov:prov,
                                     dob:dob,
-                                    course:course,
                                     phone:phone,
                                     prefix:prefix,
                                 },
@@ -389,12 +431,6 @@
                         <div class="mb-3">
                             <input type="text" class="form-control" maxlength="100" id="phone" value="${custom.phone ?? ''}" placeholder="Phone">
                         </div>
-                        <select class="form-select" aria-label="selectCourse" id="course">
-                            <option value="" selected disabled>* Select course</option>
-                            @foreach ($courses ?? [] as $course)
-                                <option value="{{ $course->id }}" ${ custom.course == {{ $course->id }} ? 'selected' : '' }>{{ $course->name }}</option>
-                            @endforeach
-                        </select>
                     `,
                     showCancelButton: true,
                     preConfirm: (agnName) => {
@@ -407,7 +443,6 @@
                         const addr = document.getElementById("addr").value;
                         const prov = document.getElementById("prov").value;
                         const dob = document.getElementById("dob").value;
-                        const course = document.getElementById("course").value;
                         const phone = document.getElementById("phone").value;
                         if (cid && name) {
                             $.ajax({
@@ -425,7 +460,6 @@
                                     addr:addr,
                                     prov:prov,
                                     dob:dob,
-                                    course:course,
                                     phone:phone,
                                     lname:lname,
                                     prefix:prefix,
@@ -486,6 +520,52 @@
                                 Swal.fire({
                                     title: "Deleted!",
                                     text: "Customer has been deleted.",
+                                    icon: "success"
+                                }).then((res) => {
+                                    if (res.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                            },
+                            error: (error) => {
+                                console.log(error);
+                                Swal.fire({
+                                    title: "Sorry!",
+                                    text: "Something wrong!",
+                                    icon: "error"
+                                }).then((res) => {
+                                    if (res.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    showLoaderOnConfirm: true,
+                    allowOutsideClick: () => !Swal.isLoading()
+                });
+            });
+
+            $(document).on("click", ".remBtn", function() {
+                const user_id = $(this).attr('uid');
+                const course_id = $(this).attr('cid');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!",
+                    preConfirm: () => {
+                        $.ajax({
+                            url: `/customer/remove/${user_id}/${course_id}`,
+                            method: 'GET',
+                            success: function (response) {
+                                console.log(response);
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Customer course has been removed.",
                                     icon: "success"
                                 }).then((res) => {
                                     if (res.isConfirmed) {
