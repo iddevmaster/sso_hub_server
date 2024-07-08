@@ -274,9 +274,9 @@ class HomeController extends Controller
 
     public function customerTable() {
         if (Auth::user()->hasRole('admin')) {
-            $customers = User::role('customer')->orderBy('id', 'desc')->get();
+            $customers = User::role('customer')->orderBy('id', 'desc')->paginate(10);
         } else {
-            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->get();
+            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->paginate(10);
         }
         $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
 

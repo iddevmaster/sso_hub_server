@@ -56,7 +56,7 @@
 
                 <div class="card shadow-sm">
                     <div class="card-body table-responsive">
-                        <table class="table table-hover display nowrap" id="customerTable" style="width:100%;">
+                        <table class="table table-hover display nowrap" style="width:100%;">
                             <thead>
                                 <tr class="table-dark">
                                     <th class="text-start">Citizen ID</th>
@@ -156,6 +156,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        {{ $customers->links() }}
                     </div>
                 </div>
             </div>
