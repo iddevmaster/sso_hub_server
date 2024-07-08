@@ -7,11 +7,10 @@
                 <div class="d-flex justify-content-between my-3">
                     <h1 class="text-center">Customers</h1>
                     <div class="container d-flex align-items-center justify-content-end">
-                        <form action="{{ route('customerSearch') }}" method="POST" role="search">
+                        <form action="{{ route('customerSearch') }}" method="GET" role="search">
                             @csrf
                             <div class="input-group">
-                                <input type="text" class="form-control" name="searchText" placeholder="Search users">
-                                <span class="input-group-btn">
+                                <input type="text" class="form-control" name="searchText" placeholder="Search Citizen ID or Name" value="{{ $search ?? '' }}">
                                     <button type="submit" class="btn btn-default">
                                         <span class="glyphicon glyphicon-search"></span>
                                     </button>

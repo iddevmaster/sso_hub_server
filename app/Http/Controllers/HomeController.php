@@ -272,23 +272,8 @@ class HomeController extends Controller
         return response()->json(['message' => $request->all()]);
     }
 
-    public function customerTable() {
-        if (Auth::user()->hasRole('admin')) {
-            $customers = User::role('customer')->orderBy('id', 'desc')->paginate(10);
-        } else {
-            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->paginate(10);
-        }
-        $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
-
-        return view('pages.customer-table', compact('customers', 'courses'));
-    }
-
-    public function customerLogin() {
-        return view('auth.customer-login');
-    }
-
-    public function customerSearch(Request $request) {
-        $search = $request->searchText;
+    public function customerTable(Request $request) {
+        $search = $request->session()->get('search') ?? '';
         if (Auth::user()->hasRole('admin')) {
             $customers = User::role('customer')->where(function ($query) use ($search) {
                 $query->where('username', 'LIKE', "%$search%")
@@ -304,6 +289,17 @@ class HomeController extends Controller
         }
         $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
 
-        return view('pages.customer-table', compact('customers', 'courses'));
+        return view('pages.customer-table', compact('customers', 'courses', 'search'));
+    }
+
+    public function customerLogin() {
+        return view('auth.customer-login');
+    }
+
+    public function customerSearch(Request $request) {
+        $search = $request->query('searchText');
+        $request->session()->put('search', $search);
+
+        return redirect()->route('customerTable');
     }
 }
