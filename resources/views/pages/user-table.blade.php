@@ -73,7 +73,7 @@
                         <select class="form-select mb-3" aria-label="Default select example" id="brn">
                             <option value="" selected disabled>Select department</option>
                             @foreach ($brns as $brn)
-                                <option value="{{ $brn->id }}">{{ $brn->name }}</option>
+                                <option value="{{ $brn->brn_id }}">{{ $brn->name }}</option>
                             @endforeach
                         </select>
                         <select class="form-select" aria-label="selectRole" id="role">
@@ -168,7 +168,7 @@
                         <select class="form-select mb-3" aria-label="Default select example" id="brn">
                             <option value="" selected disabled>Select department</option>
                             @foreach ($brns as $brn)
-                                <option value="{{ $brn->id }}" ${ebrn == "{{ $brn->id }}" ? 'selected' : ''}>{{ $brn->name }}</option>
+                                <option value="{{ $brn->brn_id }}" ${ebrn == "{{ $brn->brn_id }}" ? 'selected' : ''}>{{ $brn->name }}</option>
                             @endforeach
                         </select>
                         <select class="form-select" aria-label="selectRole" id="role">

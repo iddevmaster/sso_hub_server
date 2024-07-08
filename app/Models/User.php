@@ -44,10 +44,10 @@ class User extends Authenticatable
         return json_decode($value, true);
     }
     public function getBrn() {
-        return $this->belongsTo(Branch::class, 'brn');
+        return $this->belongsTo(Branch::class, 'brn', 'brn_id');
     }
     public function getAgn() {
-        return $this->belongsTo(Agency::class, 'agn');
+        return $this->belongsTo(Agency::class, 'agn', 'agn_id');
     }
 
     /**
