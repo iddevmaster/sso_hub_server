@@ -286,4 +286,24 @@ class HomeController extends Controller
     public function customerLogin() {
         return view('auth.customer-login');
     }
+
+    public function customerSearch(Request $request) {
+        $search = $request->searchText;
+        if (Auth::user()->hasRole('admin')) {
+            $customers = User::role('customer')->where(function ($query) use ($search) {
+                $query->where('username', 'LIKE', "%$search%")
+                      ->orWhere('name', 'LIKE', "%$search%")
+                      ->orWhere('lname', 'LIKE', "%$search%");
+            })->orderBy('id', 'desc')->paginate(10);
+        } else {
+            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->where(function ($query) use ($search) {
+                $query->where('username', 'LIKE', "%$search%")
+                      ->orWhere('name', 'LIKE', "%$search%")
+                      ->orWhere('lname', 'LIKE', "%$search%");
+            })->orderBy('id', 'desc')->paginate(10);
+        }
+        $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
+
+        return view('pages.customer-table', compact('customers', 'courses'));
+    }
 }

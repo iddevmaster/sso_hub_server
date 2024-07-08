@@ -22,6 +22,7 @@ Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])-
 Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->name('dataTable')->middleware('adminAndStaff');
 // Route::get('/permissions', [App\Http\Controllers\HomeController::class, 'permTable'])->name('user.perm');
 Route::get('/customers', [App\Http\Controllers\HomeController::class, 'customerTable'])->name('customerTable')->middleware('adminAndStaff');
+Route::post('/customers/search', [App\Http\Controllers\HomeController::class, 'customerSearch'])->name('customerSearch')->middleware('adminAndStaff');
 Route::post('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');
 Route::post('/users/store', [App\Http\Controllers\HomeController::class, 'storeUser'])->name('user.store')->middleware('adminAndStaff');
 Route::post('/users/update', [App\Http\Controllers\HomeController::class, 'updateUser'])->name('user.update')->middleware('adminAndStaff');

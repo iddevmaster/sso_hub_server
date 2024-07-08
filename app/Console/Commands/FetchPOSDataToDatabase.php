@@ -117,7 +117,11 @@ class FetchPOSDataToDatabase extends Command
                                 'lname' => $student['student_lastname_th'],
                                 'brn' => $brn->brn_id,
                                 'agn' => $agn->agn_id,
-                                'role' => 'customer'
+                                'role' => 'customer',
+                                'prefix_eng' => $student['student_prefix_eng'],
+                                'fname_eng' => $student['student_firstname_eng'],
+                                'lname_eng' => $student['student_lastname_eng'],
+                                'learning_status' => $student['student_learning_status'],
                             ]);
                         } catch (\Throwable $th) {
                             echo "Create customer error: " . $th->getMessage() . "\n";

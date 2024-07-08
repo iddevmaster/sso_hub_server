@@ -37,6 +37,10 @@ class User extends Authenticatable
         'phone',
         'course',
         'life_time',
+        'prefix_eng',
+        'fname_eng',
+        'lname_eng',
+        'learning_status',
     ];
 
     public function getCourseAttribute($value)
