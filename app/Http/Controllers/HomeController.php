@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
@@ -277,7 +278,8 @@ class HomeController extends Controller
         } else {
             $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->get();
         }
-        $courses = Course::orderBy('id', 'desc')->get();
+        $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
+
         return view('pages.customer-table', compact('customers', 'courses'));
     }
 

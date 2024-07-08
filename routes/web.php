@@ -42,3 +42,8 @@ Route::get('/customer/clean', [App\Http\Controllers\CustomerController::class, '
 Route::get('/customers/deleted', [App\Http\Controllers\CustomerController::class, 'deletedCustomer'])->name('deleted-customers')->middleware('admin');
 Route::post('/customers/add-course/{uid}', [App\Http\Controllers\CustomerController::class, 'addCourse'])->name('customer-add-course');
 Route::get('/customer/remove/{uid}/{cid}', [App\Http\Controllers\CustomerController::class, 'removeCourse'])->name('customer-remove-course');
+
+// php info route
+Route::get('/phpinfo', function () {
+    return phpinfo();
+})->middleware('admin');
