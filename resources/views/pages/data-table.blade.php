@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+    <div>
         <div class="row justify-content-center">
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
@@ -18,7 +18,7 @@
                                     <th>Code</th>
                                     <th>Name</th>
                                     <th>Type</th>
-                                    <th>From</th>
+                                    <th>Source</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
