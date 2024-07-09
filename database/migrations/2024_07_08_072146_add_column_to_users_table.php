@@ -24,6 +24,9 @@ return new class extends Migration
             if (!Schema::hasColumn('users', 'learning_status')) {
                 $table->integer('learning_status')->default(0);
             }
+            if (!Schema::hasColumn('users', 'nationality')) {
+                $table->string('nationality')->default('TH');
+            }
         });
     }
 
@@ -44,6 +47,9 @@ return new class extends Migration
             }
             if (Schema::hasColumn('users', 'learning_status')) {
                 $table->dropColumn('learning_status');
+            }
+            if (Schema::hasColumn('users', 'nationality')) {
+                $table->dropColumn('nationality');
             }
         });
     }

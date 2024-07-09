@@ -212,6 +212,12 @@ class FetchApiDataToDatabase extends Command
 
                     if (!$customer) {
                         try {
+                            $student_id = $student['student_code'];
+                            $national = 'TH';
+                            if ($student_id) {
+                                $split_code = $student['student_code'][0] . $student['student_code'][1];
+                                $national = $split_code;
+                            }
                             $customer = User::create([
                                 'username' => $student['student_identification_number'],
                                 'password' => Hash::make($student['student_identification_number']),
@@ -225,6 +231,7 @@ class FetchApiDataToDatabase extends Command
                                 'fname_eng' => $student['student_firstname_eng'],
                                 'lname_eng' => $student['student_lastname_eng'],
                                 'learning_status' => $student['student_learning_status'],
+                                'nationality' => $national ?? 'TH',
                             ]);
                         } catch (\Throwable $th) {
                             echo "Create customer error: " . $th->getMessage() . "\n";
