@@ -55,8 +55,8 @@ class CustomerController extends Controller
             'dob' => $request->dob,
             'phone' => $request->phone,
             'staff' => $request->user()->id,
-            'brn' => $request->user()->getBrn->name,
-            'agn' => $request->user()->getAgn->name,
+            'brn' => $request->user()->brn,
+            'agn' => $request->user()->agn,
             'role' => 'customer'
         ]);
 
