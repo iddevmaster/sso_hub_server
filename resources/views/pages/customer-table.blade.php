@@ -95,7 +95,7 @@
                                         <tr>
                                             <th class="text-start">{{ $user->username }}</th>
                                             <td>{{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}</td>
-                                            <td class="text-start">{{ $user->brn }}</td>
+                                            <td class="text-start">{{ optional($user->getBrn)->name }}</td>
                                             @php
                                                 $user_courses = App\Models\User_has_course::where(
                                                     'user_id',
@@ -116,9 +116,13 @@
                                                 </ol>
                                             </td>
                                             @php
+                                            if ($user->created_at) {
                                                 $userThaiDate = Carbon\Carbon::parse($user->created_at)->thaidate('d M Y');
+                                            } else {
+                                                $userThaiDate = '-Unknow-';
+                                            }
                                             @endphp
-                                            <td>{{ $userThaiDate ?? '-Unknow-' }}</td>
+                                            <td>{{ $userThaiDate }}</td>
                                             <td>
                                                 {{-- User detail modal --}}
                                                 <button class="btn btn-sm btn-info" data-bs-toggle="modal"
@@ -152,7 +156,7 @@
                                                                     <div class="col-12"><b>Address:</b> {{ $user->address }}
                                                                     </div>
                                                                     <div class="col-12"><b>Branch: </b>
-                                                                        {{ $user->brn . ' / ' . $user->agn }}</div>
+                                                                        {{ optional($user->getBrn)->name . ' / ' . optional($user->getAgn)->name }}</div>
                                                                     <div class="col-12"><b>Course:</b></div>
                                                                     @foreach ($user_courses as $index => $course)
                                                                         <div class="col-12 ms-3">{{ $index + 1 }}.
