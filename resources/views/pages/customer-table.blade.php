@@ -81,6 +81,7 @@
                                     <th>Name</th>
                                     <th class="text-start">Branch</th>
                                     <th>Course</th>
+                                    <th>Date</th>
                                     <th class="text-start">Action</th>
                                 </tr>
                             </thead>
@@ -114,6 +115,10 @@
                                                     @endforeach
                                                 </ol>
                                             </td>
+                                            @php
+                                                $userThaiDate = Carbon\Carbon::parse($user->created_at)->thaidate('d M Y');
+                                            @endphp
+                                            <td>{{ $userThaiDate ?? '-Unknow-' }}</td>
                                             <td>
                                                 {{-- User detail modal --}}
                                                 <button class="btn btn-sm btn-info" data-bs-toggle="modal"
