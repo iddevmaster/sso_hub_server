@@ -281,7 +281,7 @@ class HomeController extends Controller
                       ->orWhere('lname', 'LIKE', "%$search%");
             })->orderBy('id', 'desc')->paginate(10);
         } else {
-            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->where(function ($query) use ($search) {
+            $customers = User::role('customer')->where('brn', Auth::user()->brn)->where(function ($query) use ($search) {
                 $query->where('username', 'LIKE', "%$search%")
                       ->orWhere('name', 'LIKE', "%$search%")
                       ->orWhere('lname', 'LIKE', "%$search%");
