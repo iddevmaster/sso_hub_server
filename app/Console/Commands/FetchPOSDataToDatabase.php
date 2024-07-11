@@ -32,8 +32,8 @@ class FetchPOSDataToDatabase extends Command
      */
     public function handle()
     {
-        $apiUrl = 'https://pos.trainingzenter.com/api/student/2024-05-20';
-        // $apiUrl = 'https://pos.trainingzenter.com/api/student/' . date("Y-m-d");
+        // $apiUrl = 'https://pos.trainingzenter.com/api/student/2024-05-20';
+        $apiUrl = 'https://pos.trainingzenter.com/api/student/' . date("Y-m-d");
 
         try {
             $response = Http::withHeaders([
@@ -43,7 +43,7 @@ class FetchPOSDataToDatabase extends Command
             if ($response->successful()) {
                 $responseData = $response->json();
                 $this->processDataAndStore($responseData);
-                $this->info('Data fetched and stored successfully!');
+                $this->info('Data fetched and stored successfully! ' . date("Y-m-d"));
             } else {
                 $this->error('API request failed with status code: ' . $response->status());
             }

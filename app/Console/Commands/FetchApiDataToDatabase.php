@@ -33,7 +33,7 @@ class FetchApiDataToDatabase extends Command
     public function handle()
     {
         $apiDest = $this->argument('api_dest');
-        $apiUrl = 'http://www.dsmsys.net/'. $apiDest . '/tz/?date=2024-07-04';
+        $apiUrl = 'http://www.dsmsys.net/'. $apiDest . '/tz/?date=' . date("Y-m-d");
         try {
 
             $response = Http::withHeaders([
@@ -43,7 +43,7 @@ class FetchApiDataToDatabase extends Command
             if ($response->successful()) {
                 $responseData = $response->json();
                 $this->processDataAndStore($responseData, $apiDest);
-                $this->info('Data fetched and stored successfully!');
+                $this->info('Data fetched and stored successfully! ' . date("Y-m-d"));
             } else {
                 $this->error('API request failed with status code: ' . $response->status());
             }
