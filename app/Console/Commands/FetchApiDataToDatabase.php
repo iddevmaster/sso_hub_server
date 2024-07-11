@@ -218,7 +218,21 @@ class FetchApiDataToDatabase extends Command
                             $national = 'TH';
                             if ($student_id) {
                                 $split_code = $student['student_code'][0] . $student['student_code'][1];
-                                $national = $split_code;
+                                switch ($split_code) {
+                                    case 'PK':
+                                        $national = "PK";
+                                        break;
+                                    case 'PL':
+                                        $national = "PL";
+                                        break;
+                                    case 'PM':
+                                        $national = "PM";
+                                        break;
+                                    default:
+                                        $national = "TH";
+                                        break;
+                                }
+                                echo "National: " . $national . "\n";
                             }
                             $customer = User::create([
                                 'username' => $student['student_identification_number'],
