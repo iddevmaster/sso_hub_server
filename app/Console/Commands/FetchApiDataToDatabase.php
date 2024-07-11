@@ -33,15 +33,15 @@ class FetchApiDataToDatabase extends Command
     public function handle()
     {
         $apiDest = $this->argument('api_dest');
-        $apiUrl = 'http://www.dsmsys.net/'. $apiDest . '/tz/?date=' . date("Y-m-d");
+        $apiUrl = 'http://www.dsmsys.net/'. $apiDest . '/tz/?date=2024-07-04';
         try {
 
             $response = Http::withHeaders([
                 "Authorization" => "Basic YWRtaW50ejpRYkh2NGJxZA=="
             ])->get($apiUrl);
-            $responseData = $response->json();
 
             if ($response->successful()) {
+                $responseData = $response->json();
                 $this->processDataAndStore($responseData, $apiDest);
                 $this->info('Data fetched and stored successfully!');
             } else {
@@ -65,6 +65,7 @@ class FetchApiDataToDatabase extends Command
     private function processDataAndStore(array $responseData, $apiDest)
     {
         echo "start process data and store dest: ". $apiDest ."\n";
+
         $agn = Agency::where('prefix', 'IDD')->orWhere('agn_id', "IDD0002")->orWhere('name', "โรงเรียนสอนขับรถ ไอดี ไดร์ฟเวอร์")->first();
         if (!$agn) {
             $agn = Agency::create([
@@ -206,6 +207,7 @@ class FetchApiDataToDatabase extends Command
             }
 
             echo "Course: " . $course->code . "\n";
+            echo "Student found: " . count($dataItem['data']) . "\n";
             if (count($dataItem['data']) > 0) {
                 foreach ($dataItem['data'] as $student) {
                     $customer = User::where('username', $student['student_identification_number'])->first();

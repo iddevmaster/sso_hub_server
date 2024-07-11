@@ -39,9 +39,9 @@ class FetchPOSDataToDatabase extends Command
             $response = Http::withHeaders([
                 "Authorization" => "Basic YWRtaW50ejpRYkh2NGJxZA=="
             ])->get($apiUrl);
-            $responseData = $response->json();
 
             if ($response->successful()) {
+                $responseData = $response->json();
                 $this->processDataAndStore($responseData);
                 $this->info('Data fetched and stored successfully!');
             } else {
