@@ -213,15 +213,15 @@ class HomeController extends Controller
     }
 
     public function storeUser(Request $request) {
-        $brn = Branch::find($request->brn);
+        $brn = Branch::where('brn_id' ,$request->brn)->first();
         $user = User::create([
             'prefix' => $request->prefix,
             'name' => $request->name,
             'lname' => $request->lname,
             'username' => $request->uname,
             'password' => Hash::make($request->pass),
-            'brn' => $brn->id,
-            'agn' => optional($brn->getAgn)->id,
+            'brn' => $brn->brn_id,
+            'agn' => optional($brn->getAgn)->agn_id,
             'role' => '',
             'icon' => '',
         ]);
