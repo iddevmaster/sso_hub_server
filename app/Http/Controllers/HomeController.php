@@ -213,26 +213,33 @@ class HomeController extends Controller
     }
 
     public function storeUser(Request $request) {
-        $brn = Branch::where('brn_id' ,$request->brn)->first();
-        $user = User::create([
-            'prefix' => $request->prefix,
-            'name' => $request->name,
-            'lname' => $request->lname,
-            'username' => $request->uname,
-            'password' => Hash::make($request->pass),
-            'brn' => $brn->brn_id,
-            'agn' => optional($brn->getAgn)->agn_id,
-            'role' => '',
-            'icon' => '',
-        ]);
+        try {
+            $brn = Branch::where('brn_id' ,$request->brn)->first();
+            $user = User::create([
+                'prefix' => $request->prefix,
+                'name' => $request->name,
+                'lname' => $request->lname,
+                'username' => $request->uname,
+                'password' => Hash::make($request->pass),
+                'brn' => $brn->brn_id,
+                'agn' => optional($brn->getAgn)->agn_id,
+                'role' => '',
+                'icon' => '',
+            ]);
 
-        if ($request->role) {
-            $user->assignRole($request->role);
-            $user->role = $request->role;
-            $user->save();
+            if ($request->role) {
+                $user->assignRole($request->role);
+                $user->role = $request->role;
+                $user->save();
+            }
+
+            return response()->json(['message' => $request->all()]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            // response error message and status
+            dd($th->getMessage());
+            return response()->json(['error' => $th->getMessage()], 500);
         }
-
-        return response()->json(['message' => $request->all()]);
     }
 
     public function updateUser(Request $request) {
