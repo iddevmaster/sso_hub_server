@@ -25,11 +25,22 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
     $agn = Agency::where('agn_id', $request->user()->agn)->first(['name', 'agn_id']);
     $brn = Branch::where('brn_id', $request->user()->brn)->first(['name', 'brn_id']);
     // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
-    $courses = DB::table('courses')
+    if ($request->user()->nationality == 'TH') {
+        $courses = DB::table('courses')
                 ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                 ->select('courses.course_type', 'course_types.name')
                 ->whereIn('courses.id', $courses_list)
                 ->get();
+    } else {
+        $courseType = CourseType::where('code', "20240010")->get(['code', 'name']);
+        $courses = [
+            [
+                "course_type" => $courseType[0]->code,
+                "name" => $courseType[0]->name,
+            ]
+
+        ];
+    }
     $user_data = [
         "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
         "username" => $request->user()->username,
