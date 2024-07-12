@@ -101,7 +101,7 @@
                                 },
                                 data: { name:name, uname:uname, pass:pass, brn:brn, role:role, lname:lname, prefix:prefix},
                                 success: function (response) {
-                                    // console.log(response);
+                                    console.log(response);
                                     Swal.fire({
                                         title: "Success",
                                         // text: "That thing is still around?",
