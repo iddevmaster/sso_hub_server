@@ -237,7 +237,6 @@ class HomeController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             // response error message and status
-            dd($th->getMessage());
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
