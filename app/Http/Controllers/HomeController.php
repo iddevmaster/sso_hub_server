@@ -215,25 +215,25 @@ class HomeController extends Controller
     public function storeUser(Request $request) {
         try {
             $brn = Branch::where('brn_id' ,$request->brn)->first();
-            $user = User::create([
-                'prefix' => $request->prefix,
-                'name' => $request->name,
-                'lname' => $request->lname,
-                'username' => $request->uname,
-                'password' => Hash::make($request->pass),
-                'brn' => $brn->brn_id,
-                'agn' => optional($brn->getAgn)->agn_id,
-                'role' => '',
-                'icon' => '',
-            ]);
+            // $user = User::create([
+            //     'prefix' => $request->prefix,
+            //     'name' => $request->name,
+            //     'lname' => $request->lname,
+            //     'username' => $request->uname,
+            //     'password' => Hash::make($request->pass),
+            //     'brn' => $brn->brn_id,
+            //     'agn' => optional($brn->getAgn)->agn_id,
+            //     'role' => '',
+            //     'icon' => '',
+            // ]);
 
-            if ($request->role) {
-                $user->assignRole($request->role);
-                $user->role = $request->role;
-                $user->save();
-            }
+            // if ($request->role) {
+            //     $user->assignRole($request->role);
+            //     $user->role = $request->role;
+            //     $user->save();
+            // }
 
-            return response()->json(['message' => $request->all()]);
+            return response()->json(['message' => $brn]);
         } catch (\Throwable $th) {
             //throw $th;
             // response error message and status
