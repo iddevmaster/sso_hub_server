@@ -242,15 +242,15 @@ class HomeController extends Controller
     }
 
     public function updateUser(Request $request) {
-        $brn = Branch::find($request->brn);
+        $brn = Branch::where('brn_id' ,$request->brn)->first();
         $user = User::find($request->eid);
         $roles = Role::pluck('name');
         $user->prefix = $request->prefix;
         $user->name = $request->name;
         $user->lname = $request->lname;
         $user->username = $request->uname;
-        $user->brn = $brn->id;
-        $user->agn = optional($brn->getAgn)->id;
+        $user->brn = $brn->brn_id;
+        $user->agn = optional($brn->getAgn)->agn_id;
 
         if ($request->pass) {
             $user->password = Hash::make($request->pass);
