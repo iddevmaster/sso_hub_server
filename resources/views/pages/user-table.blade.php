@@ -113,7 +113,7 @@
                                     });
                                 },
                                 error: (error) => {
-                                    // console.log(error);
+                                    console.log(error);
                                     Swal.fire({
                                         title: "Sorry!",
                                         text: "Something wrong!",
