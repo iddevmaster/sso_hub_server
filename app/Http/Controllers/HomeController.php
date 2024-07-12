@@ -233,7 +233,7 @@ class HomeController extends Controller
             //     $user->save();
             // }
 
-            return response()->json(['message' => optional($brn->getAgn)->agn_id]);
+            return response()->json(['message' => optional($brn->getAgn)->name]);
         } catch (\Throwable $th) {
             //throw $th;
             // response error message and status
