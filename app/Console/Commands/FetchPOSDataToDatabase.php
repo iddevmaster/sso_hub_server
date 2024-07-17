@@ -111,10 +111,16 @@ class FetchPOSDataToDatabase extends Command
                         try {
                             $student_id = $student['student_code'];
                             $national = 'TH';
-                            if ($student_id) {
-                                $split_code = $student['student_code'][0] . $student['student_code'][1];
-                                $national = $split_code;
+                            // if student_id start with '00' then set $national = "PM" else if student_id < 13 digits then set $national = "EN" else set $national = "TH";
+                            if (substr($student_id, 0, 2) == '00') {
+                                $national = "PM";
+                            } else if (strlen($student_id) < 13) {
+                                $national = "EN";
+                            } else {
+                                $national = "TH";
                             }
+                            echo "National: " . $national . "\n";
+
                             $customer = User::create([
                                 'username' => $student['student_identification_number'],
                                 'password' => Hash::make($student['student_identification_number']),
