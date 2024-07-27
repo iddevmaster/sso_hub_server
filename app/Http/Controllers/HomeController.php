@@ -43,19 +43,23 @@ class HomeController extends Controller
         $user = auth()->user();
         $courses_list = $user->course ?? [];
         $course = Course::where('id', end($courses_list) ?? '')->first(['name']);
-        $courses_name = $course->name ?? '';
-        $user_branch = $user->brn ?? '';
-        // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
-        if (strpos($courses_name, "รถยนต์") !== false) {
-            $course_type = "car";
-        } elseif (strpos($courses_name, "จักรยานยนต์") !== false) {
-            $course_type = "motobike";
-        } elseif (strpos($courses_name, "บรรทุก") !== false) {
-            $course_type = "trailer";
+        if ($course->course_type) {
+            $course_list = CourseType::where('code', $course->course_type)->first();
+            // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
+            if (strpos($course_list->name, "รถยนต์") !== false) {
+                $course_type = "car";
+            } elseif (strpos($course_list->name, "จักรยานยนต์") !== false) {
+                $course_type = "motobike";
+            } elseif (strpos($course_list->name, "บรรทุก") !== false) {
+                $course_type = "trailer";
+            } else {
+                $course_type = "car";
+            }
         } else {
             $course_type = "car";
         }
 
+        $user_branch = optional($user->getBrn)->name ?? '';
         if (strpos($user_branch, "พยัค") !== false) {
             $send_branch = "idmsPY";
         } elseif (strpos($user_branch, "สารคาม") !== false) {
