@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\CourseType;
 use App\Models\Department;
 use App\Models\User;
+use App\Models\User_has_course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -41,8 +42,8 @@ class HomeController extends Controller
         }
 
         $user = auth()->user();
-        $courses_list = $user->course ?? [];
-        $course = Course::where('id', end($courses_list) ?? '')->first(['name']);
+        $courseid = User_has_course::where('user_id', $user->id)->orderBy('created_at', 'desc')->first(['course_id']);
+        $course = Course::where('id', $courseid->course_id)->first();
         if ($course->course_type ?? false) {
             $course_list = CourseType::where('code', $course->course_type)->first();
             // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
