@@ -43,7 +43,7 @@ class HomeController extends Controller
         $user = auth()->user();
         $courses_list = $user->course ?? [];
         $course = Course::where('id', end($courses_list) ?? '')->first(['name']);
-        if ($course->course_type) {
+        if ($course->course_type ?? false) {
             $course_list = CourseType::where('code', $course->course_type)->first();
             // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
             if (strpos($course_list->name, "รถยนต์") !== false) {
