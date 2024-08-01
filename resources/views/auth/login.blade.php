@@ -8,7 +8,6 @@
                     <div class="text-center py-3">
                         <img src="/imgs/logo.png" width="100" alt="">
                         <h1 class="m-0 fw-bold">Smart <span style="color: #F15A29">HUB</span></h1>
-                        <p><span class="fw-bold" style="color: #F15A29">Training</span>zenter</p>
                     </div>
                     <div class="mb-3">
                         <form method="POST" action="{{ route('login') }}">
