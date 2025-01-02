@@ -218,7 +218,7 @@ class FetchApiDataToDatabase extends Command
                             $national = 'TH';
 
                             // if student_id start with '00' then set $national = "PM" else if student_id < 13 digits then set $national = "EN" else set $national = "TH";
-                            if (substr($student_id, 0, 2) == '00') {
+                            if (substr($student_id, 0, 2) == '00' || substr($student_id, 0, 2) == 'PM') {
                                 $national = "PM";
                             } else if (strlen($student_id) != 13) {
                                 $national = "EN";
