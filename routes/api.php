@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
-    $courses_list = User_has_course::where('user_id', $request->user()->id)->get(['course_id']);
+    $courses_list = User_has_course::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get(['course_id']);
     $agn = Agency::where('agn_id', $request->user()->agn)->first(['name', 'agn_id']);
     $brn = Branch::where('brn_id', $request->user()->brn)->first(['name', 'brn_id']);
     // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
