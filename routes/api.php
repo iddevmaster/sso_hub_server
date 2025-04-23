@@ -29,7 +29,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         $courses = DB::table('courses')
                 ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                 ->select('courses.course_type', 'course_types.name')
-                ->whereIn('courses.id', $courses_list)
+                ->where('courses.id', $courses_list[0]->course_id)
                 ->get();
     } else {
         $courseType = CourseType::where('code', "20240010")->get(['code', 'name']);
