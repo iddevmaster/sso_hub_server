@@ -91,9 +91,11 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="/ssohub_User_Manual.pdf" target="_blank">
-                                        คู่มือการใช้งาน
-                                    </a>
+                                    @hasanyrole('admin|staff')
+                                        <a class="dropdown-item" href="/ssohub_User_Manual.pdf" target="_blank">
+                                            คู่มือการใช้งาน
+                                        </a>
+                                    @endhasanyrole
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                     document.getElementById('logout-form').submit();">
