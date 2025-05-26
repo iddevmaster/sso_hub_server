@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="d-flex justify-content-between my-3">
-                    <h1 class="text-center">ข้อมูลนักเรียน</h1>
+                    <h1 class="text-center text-nowrap">ข้อมูลนักเรียน</h1>
                     <div class="container d-flex align-items-center justify-content-end">
                         <form action="{{ route('customerSearch') }}" method="GET" role="search">
                             @csrf
