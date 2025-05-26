@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
-                    <h1 class="text-center my-3">Courses</h1>
+                    <h1 class="text-center my-3">หลักสูตร</h1>
                     @role('staff')
                         <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="course">Add</button></div>
                     @endrole
@@ -15,10 +15,10 @@
                         <table class="table table-hover display nowrap w-100" id="courseTable">
                             <thead>
                                 <tr class="table-dark">
-                                    <th>Code</th>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Source</th>
+                                    <th>รหัสหลักสูตร</th>
+                                    <th>ชื่อ</th>
+                                    <th>ประเภท</th>
+                                    <th>ที่มา</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -62,7 +62,7 @@
 
             <div class="col-md-8 mb-4">
                 <div class="d-flex justify-content-between">
-                    <h1 class="text-center my-3">Course Type</h1>
+                    <h1 class="text-center my-3">ประเภทหลักสูตร (Smart HUB)</h1>
                     <div class="d-flex"><button class="btn btn-success align-self-center addBtn" addType="ctype">Add</button></div>
                 </div>
                 <div class="card shadow-sm">
@@ -71,8 +71,8 @@
                             <thead>
                                 <tr class="table-dark">
                                     <th>#</th>
-                                    <th>Name</th>
-                                    <th>Code</th>
+                                    <th>ชื่อ</th>
+                                    <th>รหัส</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

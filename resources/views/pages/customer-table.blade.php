@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="d-flex justify-content-between my-3">
-                    <h1 class="text-center">Customers</h1>
+                    <h1 class="text-center">ข้อมูลนักเรียน</h1>
                     <div class="container d-flex align-items-center justify-content-end">
                         <form action="{{ route('customerSearch') }}" method="GET" role="search">
                             @csrf
@@ -21,7 +21,7 @@
                     <div class="d-flex gap-2">
                         @role('staff')
                             <div class="d-flex"><button class="btn btn-success align-self-center addBtn" data-toggle="tooltip"
-                                    title="Add Customer"><i class="bi bi-plus-square"></i></button></div>
+                                    title="เพิ่มนักเรียน"><i class="bi bi-plus-square"></i></button></div>
                         @endrole
                         {{-- <div class="d-flex"><button class="btn btn-primary align-self-center importBtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-toggle="tooltip" title="Import from file"><i class="bi bi-arrow-down-square"></i></button></div> --}}
                         @role('admin')
@@ -367,16 +367,16 @@
             // Add Customer Button
             $(".addBtn").click(function() {
                 Swal.fire({
-                    title: 'Add Customer',
+                    title: 'เพิ่มข้อมูลนักเรียน',
                     html: `
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="13" id="cid" placeholder="* Citizen ID (1-13 digits)" required>
+                            <input type="text" class="form-control" maxlength="13" id="cid" placeholder="* เลขบัตรประชาชน (1-13 digits)" required>
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="13" id="pass" placeholder="* Password (8-13 digits)" required>
+                            <input type="text" class="form-control" maxlength="13" id="pass" placeholder="* รหัสผ่าน (8-13 digits)" required>
                         </div>
                         <select class="form-select mb-3" aria-label="selectCourse" id="prefix">
-                            <option value="" selected disabled>Select Prefix</option>
+                            <option value="" selected disabled>*เลือกคำนำหน้าชื่อ</option>
                             <option value="นาย" >นาย</option>
                             <option value="นาง" >นาง</option>
                             <option value="นางสาว" >นางสาว</option>
@@ -384,31 +384,33 @@
                             <option value="Ms." >Ms.</option>
                         </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="*First Name">
+                            <input type="text" class="form-control" maxlength="100" id="name" placeholder="*ชื่อ">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="lname" placeholder="*Last Name">
+                            <input type="text" class="form-control" maxlength="100" id="lname" placeholder="*นามสกุล">
                         </div>
                         <select class="form-select mb-3" aria-label="selectCourse" id="gend">
-                            <option value="" selected disabled>Select Gender</option>
+                            <option value="" selected disabled>*เลือกเพศ</option>
                             <option value="ชาย" >ชาย</option>
                             <option value="หญิง" >หญิง</option>
                             <option value="เพศทางเลือก" >เพศทางเลือก</option>
                         </select>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="addr" placeholder="Address">
+                            <input type="text" class="form-control" maxlength="100" id="addr" placeholder="ที่อยู่">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="prov" placeholder="Province">
+                            <input type="text" class="form-control" maxlength="100" id="prov" placeholder="จังหวัด">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="dob" placeholder="Date of Birth">
+                            <input type="text" class="form-control" maxlength="100" id="dob" placeholder="วันเกิด">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" maxlength="100" id="phone" placeholder="Phone">
+                            <input type="text" class="form-control" maxlength="100" id="phone" placeholder="เบอร์โทรศัพท์">
                         </div>
                     `,
                     showCancelButton: true,
+                    confirmButtonText: 'บันทึก',
+                    cancelButtonText: 'ยกเลิก',
                     preConfirm: () => {
                         const cid = document.getElementById("cid").value;
                         const pass = document.getElementById("pass").value;

@@ -43,22 +43,22 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                            <a class="nav-link" href="/">หน้าหลัก</a>
                         </li>
                         @hasanyrole('admin|staff')
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('customerTable') }}">Customers</a>
+                                <a class="nav-link" href="{{ route('customerTable') }}">ข้อมูลนักเรียน</a>
                             </li>
                             {{-- <li class="nav-item">
                                 <a class="nav-link" href="{{ route('user.perm') }}">Permissions</a>
                             </li> --}}
                             @role('admin')
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('userTable') }}">Users</a>
+                                    <a class="nav-link" href="{{ route('userTable') }}">ข้อมูลผู้ใช้</a>
                                 </li>
                             @endrole
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('dataTable') }}">Data</a>
+                                <a class="nav-link" href="{{ route('dataTable') }}">ข้อมูลระบบ</a>
                             </li>
                         @endhasanyrole
                     </ul>
