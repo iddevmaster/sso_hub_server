@@ -36,13 +36,14 @@
                             <a href="https://smarthub.trainingzenter.com/sso/login" class="link-underline link-underline-opacity-0">
                                 <div class="service p-2 rounded">
                                     <img src="/imgs/logoiddrives.png" width="50" alt="">
+                                    <p class="mb-0">ระบบจัดการความรู้ออนไลน์</p>
                                     <p class="mb-0">Hub-Training</p>
                                 </div>
                             </a>
                             <a href="https://checkbefore.trainingzenter.com/sso/{{ $user->username }}/{{ $user->prefix . ' ' . $user->name . ' ' . $user->lname }}/{{ $course_type }}/{{ $send_branch ?? 'idmskk' }}" target="_BLANK" class="link-underline link-underline-opacity-0">
                                 <div class="service p-2 rounded">
                                     <img src="/imgs/logoiddrives.png" width="50" alt="">
-                                    <p class="mb-0">Check-Before</p>
+                                    <p class="mb-0">Check-Before Driving</p>
                                 </div>
                             </a>
                         </div>
