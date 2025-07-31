@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 [{"course_id":447},{"course_id":448},{"course_id":456}]
+$courses_list[0] = {"course_id":447}
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
@@ -30,7 +31,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
     // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
 
     if ($request->user()->role !== 'staff') {
-        $courses_list = User_has_course::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get(['course_id']);
+        $courses_list = User_has_course::where('user_id', $request->user()->id)->get(['course_id']);
         $courses = DB::table('courses')
                     ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                     ->select('courses.course_type', 'course_types.name')
