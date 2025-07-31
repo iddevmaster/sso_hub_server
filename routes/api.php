@@ -35,7 +35,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         $courses = DB::table('courses')
                     ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                     ->select('courses.course_type', 'course_types.name')
-                    ->where('courses.id', $courses_list[0]->course_id)
+                    ->where('courses.id', $courses_list->last()->course_id)
                     ->get();
         // if ($request->user()->nationality == 'TH') {
         //     $courses = DB::table('courses')
@@ -59,7 +59,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
             "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
             "username" => $request->user()->username,
             "role" => $request->user()->role,
-            "courses" => $courses_list->last() ?? ["not course listed"],
+            "courses" => $courses ?? [],
             "branch" => $brn ?? [],
             "agency" => $agn ?? [],
         ];
@@ -68,7 +68,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
             "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
             "username" => $request->user()->username,
             "role" => $request->user()->role,
-            "courses" => $courses ?? ["test"],
+            "courses" => $courses ?? [],
             "branch" => $brn ?? [],
             "agency" => $agn ?? [],
         ];
