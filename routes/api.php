@@ -60,7 +60,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
         "username" => $request->user()->username,
         "role" => $request->user()->role,
-        "courses" => ["test"],
+        "courses" => $courses ?? ["test"],
         "branch" => $brn ?? [],
         "agency" => $agn ?? [],
     ];
