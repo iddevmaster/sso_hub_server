@@ -56,14 +56,25 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         //     ];
         // }
     }
-    $user_data = [
-        "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
-        "username" => $request->user()->username,
-        "role" => $request->user()->role,
-        "courses" => $courses ?? ["test"],
-        "branch" => $brn ?? [],
-        "agency" => $agn ?? [],
-    ];
+    if ($request->user()->username == '1409902897821') {
+        $user_data = [
+            "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
+            "username" => $request->user()->username,
+            "role" => $request->user()->role,
+            "courses" => $courses_list ?? ["not course listed"],
+            "branch" => $brn ?? [],
+            "agency" => $agn ?? [],
+        ];
+    } else {
+        $user_data = [
+            "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
+            "username" => $request->user()->username,
+            "role" => $request->user()->role,
+            "courses" => $courses ?? ["test"],
+            "branch" => $brn ?? [],
+            "agency" => $agn ?? [],
+        ];
+    }
 
     return $user_data;
 });
