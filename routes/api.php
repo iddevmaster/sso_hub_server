@@ -31,7 +31,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
     // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
 
     if ($request->user()->role !== 'staff') {
-        $courses_list = User_has_course::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->first(['course_id']);
+        $courses_list = User_has_course::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get(['course_id']);
         $courses = DB::table('courses')
                     ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                     ->select('courses.course_type', 'course_types.name')
@@ -59,7 +59,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
             "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
             "username" => $request->user()->username,
             "role" => $request->user()->role,
-            "courses" => $courses_list ?? ["not course listed"],
+            "courses" => $courses_list->last() ?? ["not course listed"],
             "branch" => $brn ?? [],
             "agency" => $agn ?? [],
         ];
