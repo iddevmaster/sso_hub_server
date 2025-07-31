@@ -20,11 +20,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*
-[{"course_id":447},{"course_id":448},{"course_id":456}]
-$courses_list[0] = {"course_id":447}
-*/
-
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
     $agn = Agency::where('agn_id', $request->user()->agn)->first(['name', 'agn_id']);
     $brn = Branch::where('brn_id', $request->user()->brn)->first(['name', 'brn_id']);
@@ -54,25 +49,14 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         //     ];
         // }
     }
-    if ($request->user()->username == '1409902897821') {
-        $user_data = [
-            "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
-            "username" => $request->user()->username,
-            "role" => $request->user()->role,
-            "courses" => $courses ?? [],
-            "branch" => $brn ?? [],
-            "agency" => $agn ?? [],
-        ];
-    } else {
-        $user_data = [
-            "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
-            "username" => $request->user()->username,
-            "role" => $request->user()->role,
-            "courses" => $courses ?? [],
-            "branch" => $brn ?? [],
-            "agency" => $agn ?? [],
-        ];
-    }
+    $user_data = [
+        "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
+        "username" => $request->user()->username,
+        "role" => $request->user()->role,
+        "courses" => $courses ?? [],
+        "branch" => $brn ?? [],
+        "agency" => $agn ?? [],
+    ];
 
     return $user_data;
 });
