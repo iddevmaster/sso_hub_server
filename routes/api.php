@@ -30,7 +30,7 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         $courses = DB::table('courses')
                     ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                     ->select('courses.course_type', 'course_types.name')
-                    ->where('courses.id', $courses_list->last()->course_id)
+                    ->where('courses.id', $courses_list->first()->course_id)
                     ->get();
         // if ($request->user()->nationality == 'TH') {
         //     $courses = DB::table('courses')
