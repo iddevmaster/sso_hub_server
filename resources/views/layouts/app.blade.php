@@ -6,7 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/x-icon" href="/imgs/logo.png">
+    <link rel="icon" type="image/x-icon" href="/imgs/smarthubtz_logo.png">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -31,7 +31,7 @@
     <div id="app" >
         <nav class="navbar navbar-expand-md shadow-sm">
             <div class="container">
-                <img src="/imgs/logo.png" width="50" alt="">
+                <img src="/imgs/smarthubtz_logo.png" width="50" alt="">
                 <a class="navbar-brand mx-2" href="{{ url('/') }}">
                     <b>Smart HUB</b>
                 </a>

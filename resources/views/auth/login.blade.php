@@ -6,7 +6,7 @@
             <div class="card shadow w-md-25">
                 <div class="card-body">
                     <div class="text-center py-3">
-                        <img src="/imgs/logo.png" width="100" alt="">
+                        <img src="/imgs/smarthubtz_logo.png" width="100" alt="">
                         <h1 class="m-0 fw-bold">Smart <span style="color: #F15A29">HUB</span></h1>
                     </div>
                     <div class="mb-3">
