@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -116,8 +117,13 @@ class HomeController extends Controller
         $perms = Permission::all();
         $roles = Role::all();
         $course_type = CourseType::all();
+        $roleUserCounts = DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->select('roles.name', DB::raw('count(*) as count'))
+            ->groupBy('roles.name')
+            ->pluck('count', 'name');
 
-        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses', 'course_type'));
+        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses', 'course_type', 'roleUserCounts'));
     }
 
     public function permTable() {

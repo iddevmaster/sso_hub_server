@@ -216,7 +216,7 @@
                                     <tr>
                                         <th>{{ $index + 1 }}</th>
                                         <td>{{ $role->name }}</td>
-                                        <td>{{ App\Models\User::with('roles')->get()->filter(fn ($user) => $user->roles->where('name', $role->name)->toArray())->count() }}</td>
+                                        <td>{{ $roleUserCounts[$role->name] ?? 0 }}</td>
                                         <td>
                                             <button class="btn btn-sm btn-danger delBtn" delType="role" delId="{{ $role->name }}"><i class="bi bi-trash3"></i></button>
                                         </td>
