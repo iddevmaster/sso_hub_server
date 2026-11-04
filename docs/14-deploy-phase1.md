@@ -22,6 +22,22 @@ curl -s -H "Authorization: Bearer $TOKEN" "$DTMS_URL/api/integrations/sso/change
 
 ต้องได้ JSON ที่มี `items`, `next_cursor`, `has_more` ถ้าได้ 401 token ผิด, 404 feed ยังปิดอยู่
 
+## ตรวจเวอร์ชัน PHP (ทำก่อนเริ่ม)
+
+prod มี PHP 8.2 และ 8.3 ติดตั้งและ FPM ทั้งสองรันอยู่ ต้องตรวจว่าแต่ละส่วนใช้ตัวไหน และต้องเป็น 8.2 หรือ 8.3 เท่านั้น (ไม่ใช่ 8.4)
+
+```bash
+php -v                                   # CLI ที่ composer / artisan ใช้ (/usr/bin/php ผ่าน update-alternatives)
+sudo nginx -T 2>/dev/null | grep -n -B2 -A12 "sso" | grep -E "server_name|root|fastcgi_pass"   # FPM ที่เว็บใช้ (php8.2-fpm.sock หรือ php8.3-fpm.sock)
+crontab -l                               # cron: ต้องใช้ path เต็ม เช่น /usr/bin/php8.3 ไม่ใช่ php เฉย ๆ
+/usr/bin/php8.2 $(which composer) check-platform-reqs
+/usr/bin/php8.3 $(which composer) check-platform-reqs
+```
+
+- ควรให้ CLI, FPM และ cron ใช้เวอร์ชันเดียวกัน (แนะนำ 8.3) ถ้าไม่ตรงกัน `vendor/composer/platform_check.php` อาจทำให้ตัวใดตัวหนึ่ง error
+- เปลี่ยน FPM ของเว็บเป็นอีกตัว: แก้ `fastcgi_pass` ใน nginx แล้ว `sudo nginx -t && sudo systemctl reload nginx`
+- ถ้า `apachectl -M | grep php` ไม่เจออะไร แปลว่าไม่ได้ใช้ mod_php (ผลที่ตรวจแล้วบน prod เป็นแบบนี้ ให้ตรวจที่ nginx)
+
 ## 1. สำรองก่อนทุกอย่าง
 
 ```bash
@@ -54,7 +70,8 @@ composer install --no-dev --optimize-autoloader
 
 - ตั้งให้เซิร์ฟเวอร์ติดตาม `main` ต่อไป (`git checkout main` ครั้งเดียวพอ ครั้งหน้าใช้ `git pull`)
 - `main` ต้องมีอยู่บน `origin` ก่อน (ถ้ายังไม่ได้ push ให้ push ก่อนสลับ)
-- `composer.lock` อัปเดต `lcobucci/clock` เป็น 3.5.0 แล้ว (ตัวเดิม 3.0.0 รองรับ PHP 8.1/8.2 เท่านั้น) ทำให้ `composer install` ผ่านบน PHP 8.3 ได้ตามปกติ ตรวจแล้วกับ PHP 8.3.28 ส่วน prod เป็น 8.3.36 ห้ามใช้ `--ignore-platform-req` บน prod
+- `composer.lock` ใช้ `lcobucci/clock` 3.3.1 ซึ่งรองรับ PHP 8.2, 8.3 และ 8.4 (ตัวเดิม 3.0.0 พังบน 8.3 และ 3.5.0 พังบน 8.2) แพ็กเกจที่เข้มสุดตอนนี้คือ `lcobucci/jwt` 5.2.0 ที่รองรับถึง 8.3 เท่านั้น **ห้ามรันบน PHP 8.4** ห้ามใช้ `--ignore-platform-req` บน prod
+- เซิร์ฟเวอร์ prod มี PHP หลายตัว (CLI และ FPM 8.2, 8.3 รันอยู่พร้อมกัน, มี 8.4 ติดตั้งไว้) ต้องรู้ว่าเว็บและ cron ใช้ตัวไหน ดูหัวข้อ "ตรวจเวอร์ชัน PHP" ด้านล่าง
 - ถ้าใช้ `npm run build` อยู่ ไม่มีไฟล์ frontend เปลี่ยนในรอบนี้ ข้ามได้ ยกเว้น `resources/views/pages/customer-table.blade.php` (blade ไม่ต้อง build)
 
 ## 3. ตั้งค่า `.env` (ห้ามทับ `.env` เดิม)
