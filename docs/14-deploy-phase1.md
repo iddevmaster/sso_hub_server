@@ -30,13 +30,30 @@ mysqldump --single-transaction -u USER -p DB_NAME > sso_before_dtms_$(date +%F).
 
 เก็บไฟล์ไว้นอกเซิร์ฟเวอร์ด้วย migration รอบนี้ **เพิ่ม** ตารางและคอลัมน์อย่างเดียว ไม่แก้หรือลบข้อมูลเดิม แต่ `dtms:sync` ในขั้น 7 จะ **เขียนทับชื่อและสาขา** ของนักเรียนที่มีอยู่แล้ว (เลขบัตรตรงกัน) จึงต้องมี backup
 
-## 2. อัปเดตโค้ด
+## 2. อัปเดตโค้ด (สลับจาก `ImproveStructer` เป็น `main`)
+
+ตอนนี้ prod รัน branch `ImproveStructer` และจะสลับไปใช้ `main` ซึ่งมีงานของ `ImproveStructer` ครบอยู่แล้ว (merge เข้า `main` แล้ว) ส่วนต่างที่ขึ้น prod จริงคือโค้ด DTMS sync, การแก้ช่องโหว่ A1–A4, การแก้ login และเอกสาร (ประมาณ 72 ไฟล์) ไม่มีงานปรับโครงสร้างเพิ่มจากที่ prod รันอยู่
+
+ก่อนสลับ ตรวจว่าเซิร์ฟเวอร์ไม่มีไฟล์ที่ถูกแก้ด้วยมือ:
 
 ```bash
-git pull
+git status --short          # ต้องว่าง (ไฟล์ที่ git ไม่ track เช่น .env, storage/ ไม่นับ)
+git rev-parse --abbrev-ref HEAD   # ต้องเป็น ImproveStructer
+git rev-parse HEAD          # จดไว้ ใช้ถอยกลับ
+```
+
+- ถ้ามีไฟล์ที่ track ถูกแก้ค้าง (`M` ใน status) **ห้ามสลับ** ให้ดู `git diff` ก่อนว่าแก้อะไร ถ้าเป็นการแก้ที่ต้องเก็บ ให้ส่งกลับมาเป็น commit ในโค้ด ไม่เช่นนั้น checkout จะ error หรือทับงาน
+- `vendor/` ไม่ถูก track แต่ถ้าถูกแก้ด้วยมือ (เช่นไฟล์ `AuthenticatesUsers.php` ของ laravel/ui) `composer install` จะเขียนทับกลับเป็นของเดิม ซึ่งโค้ดใหม่ครอบคลุมไว้แล้วสำหรับ login (`LoginController::username()`) แต่ถ้ามีการแก้ `vendor/` จุดอื่น ต้องตรวจก่อน เช่นเทียบกับ backup
+
+```bash
+git fetch origin
+git checkout main
+git pull --ff-only origin main
 composer install --no-dev --optimize-autoloader
 ```
 
+- ตั้งให้เซิร์ฟเวอร์ติดตาม `main` ต่อไป (`git checkout main` ครั้งเดียวพอ ครั้งหน้าใช้ `git pull`)
+- `main` ต้องมีอยู่บน `origin` ก่อน (ถ้ายังไม่ได้ push ให้ push ก่อนสลับ)
 - `composer.lock` ล็อก `lcobucci/clock` 3.0 ซึ่งรองรับ PHP 8.1/8.2 เท่านั้น ถ้า prod เป็น 8.3 ขึ้นไป `composer install` จะ error ต้องแก้ lock ด้วย `composer update lcobucci/clock` ในเครื่อง dev แล้ว commit (ยังไม่ได้ทำ) ห้ามใช้ `--ignore-platform-req` บน prod
 - ถ้าใช้ `npm run build` อยู่ ไม่มีไฟล์ frontend เปลี่ยนในรอบนี้ ข้ามได้ ยกเว้น `resources/views/pages/customer-table.blade.php` (blade ไม่ต้อง build)
 
@@ -185,7 +202,7 @@ php artisan schedule:list      # ต้องเห็น dtms:sync ทุกน
 |---|---|
 | sync มีปัญหา ต้องหยุดชั่วคราว | ลบ `DTMS_SYNC_TOKEN` ใน `.env` แล้ว `php artisan config:clear` scheduler จะหยุดรัน ข้อมูลเดิมไม่หาย |
 | ข้อมูลนักเรียนถูกเขียนผิด | restore จาก backup ขั้น 1 (ระวังข้อมูลที่เข้ามาหลัง backup) |
-| ยกเลิกโค้ดทั้งหมด | หยุด sync ก่อน แล้ว `php artisan migrate:rollback --step=1` จะลบตารางและคอลัมน์ DTMS (ข้อมูลที่ sync แล้วในตาราง `users` ยังอยู่) จากนั้น `git checkout` ไป commit เดิม `fetch:apidata` ไม่มีข้อมูลเข้าอยู่แล้วเพราะ EM ปิด |
+| ยกเลิกโค้ดทั้งหมด | หยุด sync ก่อน แล้ว `php artisan migrate:rollback --step=1` จะลบตารางและคอลัมน์ DTMS (ข้อมูลที่ sync แล้วในตาราง `users` ยังอยู่) จากนั้น `git checkout ImproveStructer` (หรือ commit ที่จดไว้ในขั้น 2) แล้ว `composer install --no-dev` `fetch:apidata` ไม่มีข้อมูลเข้าอยู่แล้วเพราะ EM ปิด |
 | cursor เลื่อนผิด / DTMS ตอบ 410 | ติดต่อทีม DTMS ให้ re-emit แล้วตั้ง `UPDATE dtms_sync_state SET cursor='0';` |
 
 ## รูปแบบ checklist สั้น
