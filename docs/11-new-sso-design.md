@@ -117,7 +117,7 @@ SSO แค่ **บอก** ระดับสิทธิ์ใน response ข
 | `schools` | `dtms_school_id`, `slug`, `name`, `legacy_code`, `is_active` | มาจาก DTMS |
 | `branches` | `dtms_branch_id`, `school_id`, `code`, `name`, `legacy_code`, `checkbefore_code` | `checkbefore_code` แทนการเดาจากชื่อสาขา |
 | `accounts` | `id` (= `sub`), `kind`, `school_id`, `dtms_student_id` / `dtms_user_id`, `id_number`, `password` (null สำหรับ staff), `must_change_password`, ชื่อ (ไทย/อังกฤษ), `current_branch_id`, `current_course_type_code`, `current_vehicle_type`, `status` (คำนวณจาก DTMS), `admin_disabled` (แอดมินระงับเอง), `last_login_at` | นักเรียน: unique `(school_id, id_number)`, `(school_id, dtms_student_id)` · staff: unique `dtms_user_id` |
-| `course_type_map` | `vehicle_type_code`, `course_option_name` (null ได้), `course_type_code`, `course_type_name` | รักษารหัสเดิมที่ระบบปลายทางรู้จัก |
+| `course_type_map` | `vehicle_type_code`, `is_foreign` (จาก `id_number` ไม่ใช่ 13 หลัก), `course_type_code`, `course_type_name` | รักษารหัสเดิมที่ระบบปลายทางรู้จัก |
 | `client_school_access` | `client_id`, `school_id`, `access_level` | |
 | `admins` | แอดมิน SSO | แยกจากนักเรียน |
 | `dtms_sync_state`, `dtms_sync_failures` | cursor, สถานะ, รายการที่ล้มเหลว | |

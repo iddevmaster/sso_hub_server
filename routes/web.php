@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes();
+Auth::routes(['register' => false]);
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 Route::get('/toggle-theme/{isdark}', [App\Http\Controllers\HomeController::class, 'toggleTheme'])->name('toggleTheme');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'userTable'])->name('userTable')->middleware('admin');
@@ -24,9 +24,9 @@ Route::get('/data', [App\Http\Controllers\HomeController::class, 'dataTable'])->
 Route::get('/customers', [App\Http\Controllers\HomeController::class, 'customerTable'])->name('customerTable')->middleware('adminAndStaff');
 Route::get('/customers/search', [App\Http\Controllers\HomeController::class, 'customerSearch'])->name('customerSearch')->middleware('adminAndStaff');
 Route::post('/different-account', [App\Http\Controllers\HomeController::class, 'getDifferentAccount'])->name('different-account');
-Route::post('/users/store', [App\Http\Controllers\HomeController::class, 'storeUser'])->name('user.store')->middleware('adminAndStaff');
-Route::post('/users/update', [App\Http\Controllers\HomeController::class, 'updateUser'])->name('user.update')->middleware('adminAndStaff');
-Route::post('/users/delete', [App\Http\Controllers\HomeController::class, 'deleteUser'])->name('user.delete')->middleware('adminAndStaff');
+Route::post('/users/store', [App\Http\Controllers\HomeController::class, 'storeUser'])->name('user.store')->middleware('admin');
+Route::post('/users/update', [App\Http\Controllers\HomeController::class, 'updateUser'])->name('user.update')->middleware('admin');
+Route::post('/users/delete', [App\Http\Controllers\HomeController::class, 'deleteUser'])->name('user.delete')->middleware('admin');
 Route::post('/data/add', [App\Http\Controllers\HomeController::class, 'addData'])->name('data.add')->middleware('adminAndStaff');
 Route::post('/data/update', [App\Http\Controllers\HomeController::class, 'updateData'])->name('data.update')->middleware('adminAndStaff');
 Route::post('/data/delete', [App\Http\Controllers\HomeController::class, 'deleteData'])->name('data.delete')->middleware('adminAndStaff');
@@ -41,8 +41,8 @@ Route::post('/customer/reuse', [App\Http\Controllers\CustomerController::class, 
 Route::get('/customer/clean', [App\Http\Controllers\CustomerController::class, 'cleanCustomer'])->name('customer-clean')->middleware('admin');
 
 Route::get('/customers/deleted', [App\Http\Controllers\CustomerController::class, 'deletedCustomer'])->name('deleted-customers')->middleware('admin');
-Route::post('/customers/add-course/{uid}', [App\Http\Controllers\CustomerController::class, 'addCourse'])->name('customer-add-course');
-Route::get('/customer/remove/{uid}/{cid}', [App\Http\Controllers\CustomerController::class, 'removeCourse'])->name('customer-remove-course');
+Route::post('/customers/add-course/{uid}', [App\Http\Controllers\CustomerController::class, 'addCourse'])->name('customer-add-course')->middleware('adminAndStaff');
+Route::post('/customer/remove/{uid}/{cid}', [App\Http\Controllers\CustomerController::class, 'removeCourse'])->name('customer-remove-course')->middleware('adminAndStaff');
 
 // php info route
 Route::get('/phpinfo', function () {

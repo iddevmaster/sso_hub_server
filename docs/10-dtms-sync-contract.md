@@ -81,8 +81,7 @@
             "course": {
               "id": "c2d4...uuid", "code": "CAR-01", "name": "อบรมรถยนต์ 15 ชม.",
               "vehicle_type": { "code": "CAR", "name": "รถยนต์" }
-            },
-            "course_option": { "name": "ต่างชาติ" }
+            }
           }
         ]
       }
@@ -101,7 +100,8 @@
 - `student.data.enrollments` คือการลงทะเบียน **ทั้งหมด** ของนักเรียนคนนั้นในโรงเรียนนั้น (รวมที่ยกเลิก) ผู้รับใช้เขียนทับได้ทั้งชุด
 - `status` ของการลงทะเบียน: `active`, `pending_cancellation`, `cancelled`, `completed` (ตามอภิธานศัพท์ของ DTMS)
 - `school_id` ของ item ชนิด `school` เท่ากับ `id` ของตัวเอง
-- `course_option` เป็น `null` ได้; `fullname_en`, `title_prefix` เป็น `null` ได้
+- `fullname_en`, `title_prefix` เป็น `null` ได้
+- **ไม่มีฟิลด์ `course_option`** (ทีม DTMS ตัดออก 2026-11-04) feed แยกไม่ได้ว่านักเรียนซื้อแบบต่างชาติหรือไม่ ผู้รับแยก "ต่างชาติ" จาก `id_number` เองโดยถือว่าเลขที่ไม่ใช่ตัวเลข 13 หลักพอดีคือต่างชาติ (กฎเดียวกับ `fetch:*` เดิม)
 - เวลาทั้งหมดเป็น ISO 8601 พร้อม offset
 - `has_more: true` → ผู้รับเรียกต่อทันทีด้วย `after = next_cursor` จนได้ `false`
 - ผู้รับบันทึก `next_cursor` **หลัง** เขียนทุก item ของหน้านั้นเสร็จแล้วเท่านั้น

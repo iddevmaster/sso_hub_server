@@ -653,7 +653,10 @@
                     preConfirm: () => {
                         $.ajax({
                             url: `/customer/remove/${user_id}/${course_id}`,
-                            method: 'GET',
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
                             success: function(response) {
                                 console.log(response);
                                 Swal.fire({

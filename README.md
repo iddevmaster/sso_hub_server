@@ -13,11 +13,7 @@ Command :
 - `php artisan update:coursetype`
 - `php artisan update:usercourse`
 
-Fetch data from PoS and EM command:
-- `php artisan fetch:apidata idmskk` 
-- `php artisan fetch:apidata idmsLLK` 
-- `php artisan fetch:apidata idmsMK` 
-- `php artisan fetch:apidata idmsPRO` 
-- `php artisan fetch:apidata idmsPY` 
-- `php artisan fetch:apidata idmsTK` 
-- `php artisan fetch:posdata` 
+Fetch data command:
+- `php artisan dtms:sync` (DTMS, ทุก 1 นาทีผ่าน scheduler; `--dry-run`, `--retry-failures`)
+- `php artisan dtms:branches` / `php artisan dtms:map-branch {dtms_code} {brn_id}` (จับคู่สาขา DTMS กับสาขา SSO)
+- `php artisan fetch:posdata` (PoS)

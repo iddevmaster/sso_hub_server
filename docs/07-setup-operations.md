@@ -26,7 +26,7 @@ php artisan serve
 ## การสร้างผู้ใช้เพิ่ม
 
 - เจ้าหน้าที่/แอดมิน: ล็อกอินเป็น admin → เมนู "ข้อมูลผู้ใช้" → เพิ่ม (ต้องมีสาขาและ role ให้ตั้งใน "ข้อมูลระบบ" ก่อน)
-- นักเรียน: เพิ่มจากหน้า "ข้อมูลนักเรียน", นำเข้า Excel หรือรอให้คำสั่ง `fetch:*` ซิงก์เข้ามา
+- นักเรียน: เพิ่มจากหน้า "ข้อมูลนักเรียน", นำเข้า Excel หรือรอให้ `dtms:sync` ซิงก์เข้ามา
 - Agency/Branch/ประเภทคอร์ส ชุดแรกมาจาก `update:coursetype` และ `fetch:*` ที่สร้างให้อัตโนมัติ (ดู [06-data-sync.md](06-data-sync.md))
 
 ## งานประจำที่ต้องตั้งเอง
@@ -34,16 +34,11 @@ php artisan serve
 ระบบไม่มี scheduler ให้ตั้งคำสั่งภายนอกให้รันเป็นรอบ (เช่นทุกวัน) อย่างน้อย:
 
 ```bash
-php artisan fetch:apidata idmskk
-php artisan fetch:apidata idmsLLK
-php artisan fetch:apidata idmsMK
-php artisan fetch:apidata idmsPRO
-php artisan fetch:apidata idmsPY
-php artisan fetch:apidata idmsTK
+* * * * * cd /path/to/app && php artisan schedule:run >> /dev/null 2>&1   # ให้ dtms:sync ทำงานทุกนาที (ต้องตั้ง DTMS_SYNC_URL / DTMS_SYNC_TOKEN / DTMS_SCHOOL_ID ใน .env)
 php artisan fetch:posdata
 ```
 
-คำสั่งดึงข้อมูลของ "วันนี้" เท่านั้น ถ้าพลาดวันใดต้องแก้โค้ดหรือรันย้อนหลังด้วยตนเอง (ปัจจุบันไม่มีพารามิเตอร์วันที่)
+`fetch:apidata` ถูกลบแล้ว (EM ปิด) ข้อมูลนักเรียนมาจาก `dtms:sync` ดู [13-phase1-legacy-dtms-bridge.md](13-phase1-legacy-dtms-bridge.md) ส่วน `fetch:posdata` ดึงของ "วันนี้" เท่านั้น ถ้าพลาดวันใดต้องรันย้อนหลังเอง
 
 ## ทดสอบและตรวจโค้ด
 

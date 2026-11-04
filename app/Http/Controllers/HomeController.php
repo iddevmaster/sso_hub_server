@@ -133,7 +133,18 @@ class HomeController extends Controller
         return view('pages.perm-table', compact('users', 'perms', 'roles'));
     }
 
+    /**
+     * Staff may only manage courses through the data endpoints; every other
+     * data type (agency, branch, role, permission, course type) is admin only.
+     */
+    private function authorizeDataType($type): void {
+        if ($type !== 'course' && !Auth::user()->hasRole('admin')) {
+            abort(403);
+        }
+    }
+
     public function addData(Request $request) {
+        $this->authorizeDataType($request->addType);
         if ($request->addType === 'agn') {
             Agency::create([
                 'name' => $request->agnname,
@@ -166,6 +177,7 @@ class HomeController extends Controller
     }
 
     public function updateData(Request $request) {
+        $this->authorizeDataType($request->addType);
         if ($request->addType === 'agn') {
             Agency::find($request->eid)->update([
                 'name' => $request->agnname,
@@ -190,6 +202,7 @@ class HomeController extends Controller
     }
 
     public function deleteData(Request $request) {
+        $this->authorizeDataType($request->deltype);
         if ($request->deltype === 'agn') {
             Agency::find($request->delid)->delete();
         } elseif ($request->deltype === 'course') {

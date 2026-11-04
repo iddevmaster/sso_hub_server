@@ -30,8 +30,24 @@ Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request
         $courses = DB::table('courses')
                     ->join('course_types', 'courses.course_type', '=', 'course_types.code')
                     ->select('courses.course_type', 'course_types.name')
-                    ->where('courses.id', $courses_list->first()->course_id)
+                    ->where('courses.id', optional($courses_list->first())->course_id)
                     ->get();
+        // ต่างชาติ (เลขบัตรไม่ใช่ 13 หลัก) ของคอร์สที่มาจาก DTMS: ใช้ประเภทคอร์สต่างชาติตามประเภทรถ
+        $firstCourse = $courses_list->first();
+        if ($firstCourse && \App\Integrations\Dtms\IdNumber::isForeign((string) $request->user()->username)) {
+            $vehicle = Course::where('id', $firstCourse->course_id)->value('dtms_vehicle_type_code');
+            if ($vehicle) {
+                $foreignType = DB::table('dtms_course_type_map')
+                    ->join('course_types', 'dtms_course_type_map.course_type', '=', 'course_types.code')
+                    ->where('dtms_course_type_map.vehicle_type_code', $vehicle)
+                    ->where('dtms_course_type_map.is_foreign', true)
+                    ->select('course_types.code as course_type', 'course_types.name')
+                    ->first();
+                if ($foreignType) {
+                    $courses = collect([$foreignType]);
+                }
+            }
+        }
         // if ($request->user()->nationality == 'TH') {
         //     $courses = DB::table('courses')
         //             ->join('course_types', 'courses.course_type', '=', 'course_types.code')

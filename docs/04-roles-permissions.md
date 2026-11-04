@@ -31,19 +31,19 @@
 
 | Route | Method | ต้องผ่าน | หมายเหตุ |
 |---|---|---|---|
-| `/login`, `/register`, `/password/*` | — | ไม่ต้อง (guest) | จาก `Auth::routes()` — **เปิดสมัครสมาชิกสาธารณะ** |
+| `/login`, `/register`, `/password/*` | — | ไม่ต้อง (guest) | จาก `Auth::routes(['register' => false])` — `/register` ปิดแล้ว (404) ตั้งแต่ 2026-11-04 |
 | `/`, `/toggle-theme/{isdark}`, `/different-account` | GET/POST | `auth` | |
 | `/users` | GET | `admin` | รายชื่อผู้ใช้ที่ไม่ใช่นักเรียน |
-| `/users/store`, `/users/update`, `/users/delete` | POST | `adminAndStaff` | ⚠ หน้าจอเป็นของ admin แต่ endpoint เปิดให้ staff |
+| `/users/store`, `/users/update`, `/users/delete` | POST | `admin` | แก้แล้ว 2026-11-04 (เดิม `adminAndStaff`; ยังไม่ได้ตรวจบน prod) |
 | `/data` | GET | `adminAndStaff` | ข้อมูลระบบ: agency/branch/course/type/role/permission |
-| `/data/add`, `/data/update`, `/data/delete` | POST | `adminAndStaff` | ⚠ staff จัดการ role/permission/agency ได้ด้วย |
+| `/data/add`, `/data/update`, `/data/delete` | POST | `adminAndStaff` + ตรวจในคอนโทรลเลอร์ | แก้แล้ว 2026-11-04: staff ทำได้เฉพาะประเภท `course`; agn/brn/role/perm/ctype ต้องเป็น admin (403) |
 | `/customers`, `/customers/search` | GET | `adminAndStaff` | staff เห็นเฉพาะ `brn` ของตัวเอง |
 | `/customer/store`, `/customer/update`, `/customer/delete`, `/customer/import` | POST | `adminAndStaff` | update/delete ไม่ตรวจว่านักเรียนอยู่สาขาเดียวกัน |
 | `/customers/deleted` | GET | `admin` | ถังขยะ |
 | `/customer/reuse`, `/customer/delete-permanently` | POST | `admin` | กู้คืน / ลบถาวร |
 | `/customer/clean` | GET | `admin` | ลบถาวรทุกคนในถังขยะ (เปลี่ยนข้อมูลด้วย GET) |
-| `/customers/add-course/{uid}` | POST | **ไม่มี** | ⚠ ไม่มีทั้ง `auth` และตรวจ role |
-| `/customer/remove/{uid}/{cid}` | GET | **ไม่มี** | ⚠ ไม่มีทั้ง `auth` และตรวจ role |
+| `/customers/add-course/{uid}` | POST | `adminAndStaff` | แก้แล้ว 2026-11-04 (เดิมไม่มี middleware) |
+| `/customer/remove/{uid}/{cid}` | POST | `adminAndStaff` | แก้แล้ว 2026-11-04 (เดิม GET ไม่มี middleware; ตอนนี้ POST + CSRF) |
 | `/phpinfo` | GET | `admin` | |
 
 สัญลักษณ์ ⚠ = จุดที่น่าจะไม่ตั้งใจ รายละเอียดใน [08-known-issues.md](08-known-issues.md)

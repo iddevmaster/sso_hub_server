@@ -12,7 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('dtms:sync')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->when(fn () => filled(config('dtms.url')) && filled(config('dtms.token')));
     }
 
     /**

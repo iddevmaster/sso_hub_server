@@ -31,7 +31,7 @@ Tests only contain the default Laravel examples; `phpunit.xml` has the sqlite li
 
 Data-sync / maintenance artisan commands (listed in README):
 
-- `php artisan fetch:apidata {idmskk|idmsLLK|idmsMK|idmsPRO|idmsPY|idmsTK}` — pulls today's students/courses from `dsmsys.net/<dest>/tz/` for one branch
+- `php artisan dtms:sync`, `dtms:branches`, `dtms:map-branch` — DTMS IDDrives sync (coming from the phase-1 work, see `docs/13-phase1-legacy-dtms-bridge.md`). The old `fetch:apidata` (DSMS/EM) was removed because EM is shut down.
 - `php artisan fetch:posdata` — same idea from `pos.trainingzenter.com/api/student/<date>`
 - `php artisan update:database-normalize` — rewrites `users.brn`/`users.agn` from names/ids to `brn_id`/`agn_id`
 - `php artisan update:coursetype`, `php artisan update:usercourse` — backfill course types / user-course links
@@ -47,7 +47,7 @@ Data-sync / maintenance artisan commands (listed in README):
 
 **Domain model** — customers and staff are all rows in `users` (soft-deleted; "deleted customers" can be reused or permanently purged by admins). `users.username` is the national ID/passport number used to log in, and the initial password is that same value. Relations use business keys, not primary keys: `users.brn → branches.brn_id`, `users.agn → agencies.agn_id`, `courses.agn → agencies.agn_id`, whereas `branches.agn → agencies.id`. `User_has_course` (soft-deleted pivot) links users to courses; the *most recent* link determines the course type returned by the API and the vehicle type (car/motobike/trailer) chosen on the home page. `users.nationality` (`TH`/`EN`/`PM`) is inferred from the student code format in the fetch commands.
 
-**Branch mapping is hard-coded in two places** that must stay in sync: the `switch ($apiDest)` in `FetchApiDataToDatabase` (API destination → branch name/`IDD000x` id) and the Thai-substring matching in `HomeController::index` (branch name → `send_branch` code). Adding a branch means editing both.
+**Branch mapping**: the DSMS `switch ($apiDest)` is gone with `fetch:apidata`. The remaining hard-coded branch matching is the Thai-substring matching in `HomeController::index` (branch name → `send_branch` code); adding a branch means editing it. DTMS branches are mapped through table `dtms_branch_map` using the commands `dtms:branches` / `dtms:map-branch`.
 
 ## Gotchas
 

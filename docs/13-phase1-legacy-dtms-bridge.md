@@ -67,7 +67,7 @@ SSO จึงเก็บตาราง map ของตัวเอง (`dtms_
 | `user_has_courses` | `dtms_enrollment_id` (uuid, unique, nullable) | จับคู่การลงทะเบียน |
 | ใหม่ `dtms_sync_state` | `cursor`, `updated_at` | เก็บตำแหน่งที่อ่าน feed ถึง |
 | ใหม่ `dtms_sync_failures` | `event_type`, `entity_id`, `error`, `payload`, `created_at`, `resolved_at` | เก็บรายการที่ประมวลผลไม่ได้ ไม่ทำให้ทั้งรอบล้ม |
-| ใหม่ `dtms_course_type_map` | `vehicle_type_code`, `is_foreign`, `course_type` | แปลงประเภทรถ + ตัวเลือก "ต่างชาติ" เป็น `course_types.code` เดิม |
+| ใหม่ `dtms_course_type_map` | `vehicle_type_code`, `is_foreign`, `course_type` | แปลงประเภทรถ + ต่างชาติหรือไม่ เป็น `course_types.code` เดิม |
 
 ### 2. คำสั่ง `dtms:sync`
 
@@ -90,7 +90,9 @@ SSO จึงเก็บตาราง map ของตัวเอง (`dtms_
 
 - ทุกกฎต้องรันซ้ำได้ผลเหมือนเดิม (idempotent) เพราะ feed อาจส่งรายการเดิมซ้ำ
 - `completed` ยังคงสิทธิ์ เพราะยังไม่ตัดสิทธิ์ใน phase 1
-- `nationality`: กำหนดจาก course option "ต่างชาติ" ถ้ามี ไม่ต้องเดาจากรูปแบบรหัสนักเรียนแบบคำสั่ง fetch เดิม
+- **ต่างชาติ** แยกจาก `id_number`: ไม่ใช่ตัวเลข 13 หลักพอดี = ต่างชาติ (`App\Integrations\Dtms\IdNumber`) เพราะ DTMS ไม่ส่ง `course_option` แล้ว กฎนี้ตรงกับ `fetch:*` เดิม ซึ่งใช้ความยาว != 13
+- `nationality`: ตั้งตอนสร้างบัญชี `EN` ถ้าต่างชาติ นอกนั้น `TH` (ไม่มีค่า `PM` เพราะเดิมได้จากรหัสนักเรียนซึ่ง feed ไม่ส่งมา)
+- `course_type`: คอร์สจาก DTMS เก็บ `courses.course_type` ตามประเภทรถแบบไม่ต่างชาติ และเก็บ `courses.dtms_vehicle_type_code` ไว้ ตอน `/api/user` ถ้า `username` เป็นต่างชาติจะเปลี่ยนเป็นประเภทคอร์สต่างชาติจาก `dtms_course_type_map` (`is_foreign = true`) ถ้าไม่มี mapping จะคืนประเภทปกติ
 
 ### 4. แก้โค้ดเดิมที่จำเป็น
 
