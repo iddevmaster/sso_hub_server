@@ -2,6 +2,7 @@
 
 สถานะ: **ร่างเพื่อตกลงร่วมกัน** ยังไม่มีโค้ดทั้งสองฝั่ง สัญญา API อยู่ใน [10-dtms-sync-contract.md](10-dtms-sync-contract.md)
 ฝั่งผู้รับคือ **SSO ใหม่แบบหลายโรงเรียน** ([11-new-sso-design.md](11-new-sso-design.md)) ไม่ใช่ระบบเดิมใน repo นี้
+แต่ก่อนมี SSO ใหม่ จะให้ SSO เดิมอ่าน feed เดียวกันนี้ก่อน (phase 1) ดู [13-phase1-legacy-dtms-bridge.md](13-phase1-legacy-dtms-bridge.md) ซึ่งตัดบางส่วนของเอกสารนี้ออกเพื่อให้เสร็จเร็ว
 
 ## ที่มา
 
