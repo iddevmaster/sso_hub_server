@@ -54,7 +54,7 @@ composer install --no-dev --optimize-autoloader
 
 - ตั้งให้เซิร์ฟเวอร์ติดตาม `main` ต่อไป (`git checkout main` ครั้งเดียวพอ ครั้งหน้าใช้ `git pull`)
 - `main` ต้องมีอยู่บน `origin` ก่อน (ถ้ายังไม่ได้ push ให้ push ก่อนสลับ)
-- `composer.lock` ล็อก `lcobucci/clock` 3.0 ซึ่งรองรับ PHP 8.1/8.2 เท่านั้น ถ้า prod เป็น 8.3 ขึ้นไป `composer install` จะ error ต้องแก้ lock ด้วย `composer update lcobucci/clock` ในเครื่อง dev แล้ว commit (ยังไม่ได้ทำ) ห้ามใช้ `--ignore-platform-req` บน prod
+- `composer.lock` อัปเดต `lcobucci/clock` เป็น 3.5.0 แล้ว (ตัวเดิม 3.0.0 รองรับ PHP 8.1/8.2 เท่านั้น) ทำให้ `composer install` ผ่านบน PHP 8.3 ได้ตามปกติ ตรวจแล้วกับ PHP 8.3.28 ส่วน prod เป็น 8.3.36 ห้ามใช้ `--ignore-platform-req` บน prod
 - ถ้าใช้ `npm run build` อยู่ ไม่มีไฟล์ frontend เปลี่ยนในรอบนี้ ข้ามได้ ยกเว้น `resources/views/pages/customer-table.blade.php` (blade ไม่ต้อง build)
 
 ## 3. ตั้งค่า `.env` (ห้ามทับ `.env` เดิม)
