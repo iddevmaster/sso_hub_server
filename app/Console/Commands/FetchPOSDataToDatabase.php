@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User_has_course;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use App\Models\Agency;
@@ -31,18 +32,18 @@ class FetchPOSDataToDatabase extends Command
      */
     public function handle()
     {
-        $apiUrl = 'https://pos.trainingzenter.com/api/student/2024-05-20';
-        // $apiUrl = 'https://pos.trainingzenter.com/api/student/' . date("Y-m-d");
+        // $apiUrl = 'https://pos.trainingzenter.com/api/student/2024-05-20';
+        $apiUrl = 'https://pos.trainingzenter.com/api/student/' . date("Y-m-d");
 
         try {
             $response = Http::withHeaders([
                 "Authorization" => "Basic YWRtaW50ejpRYkh2NGJxZA=="
             ])->get($apiUrl);
-            $responseData = $response->json();
 
             if ($response->successful()) {
+                $responseData = $response->json();
                 $this->processDataAndStore($responseData);
-                $this->info('Data fetched and stored successfully!');
+                $this->info('Data fetched and stored successfully! ' . date("Y-m-d"));
             } else {
                 $this->error('API request failed with status code: ' . $response->status());
             }
@@ -61,18 +62,28 @@ class FetchPOSDataToDatabase extends Command
     private function processDataAndStore(array $responseData)
     {
         echo "start process data and store\n";
-        $agn = Agency::where('prefix', 'TZ')->first();
+        $agn = Agency::where('prefix', 'TZ')->orWhere('agn_id', "TZ0003")->orWhere('name', "TrainingZenter")->first();
         if (!$agn) {
             $agn = Agency::create([
                 'name' => 'TrainingZenter',
+                'agn_id' => "TZ0003",
                 'prefix' => 'TZ',
             ]);
+        } else {
+            $agn->update([
+                'agn_id' => 'TZ0003',
+            ]);
         }
-        $brn = Branch::where('name', 'TrainingZenter')->first();
+        $brn = Branch::where('name', 'TrainingZenter')->orWhere('brn_id', 'TZ0008')->first();
         if (!$brn) {
             $brn = Branch::create([
                 'name' => 'TrainingZenter',
+                'brn_id' => 'TZ0008',
                 'agn' => $agn->id,
+            ]);
+        } else {
+            $brn->update([
+                'brn_id' => "TZ0008"
             ]);
         }
         echo "Branch: " . $brn->name . " / " . $agn->name . "\n";
@@ -94,17 +105,36 @@ class FetchPOSDataToDatabase extends Command
             echo "Course: " . $course->code . " Student: " . count($dataItem['data']) . "\n";
             if (count($dataItem['data']) > 0) {
                 foreach ($dataItem['data'] as $student) {
-                    $customer = User::where('email', $student['student_identification_number'])->first();
+                    $customer = User::where('username', $student['student_identification_number'])->first();
 
                     if (!$customer) {
                         try {
+                            $student_id = $student['student_code'];
+                            $national = 'TH';
+                            // if student_id start with '00' then set $national = "PM" else if student_id < 13 digits then set $national = "EN" else set $national = "TH";
+                            if (substr($student_id, 0, 2) == '00' || substr($student_id, 0, 2) == 'PM') {
+                                $national = "PM";
+                            } else if (strlen($student_id) < 13) {
+                                $national = "EN";
+                            } else {
+                                $national = "TH";
+                            }
+                            echo "National: " . $national . "\n";
+
                             $customer = User::create([
-                                'email' => $student['student_identification_number'],
+                                'username' => $student['student_identification_number'],
                                 'password' => Hash::make($student['student_identification_number']),
-                                'name' => $student['student_firstname_th'] . ($student['student_lastname_th'] ? ' ' . $student['student_lastname_th'] : '' ),
-                                'brn' => $brn->name,
-                                'agn' => $agn->name,
-                                'role' => 'customer'
+                                'prefix' => $student['student_prefix_th'],
+                                'name' => $student['student_firstname_th'],
+                                'lname' => $student['student_lastname_th'],
+                                'brn' => $brn->brn_id,
+                                'agn' => $agn->agn_id,
+                                'role' => 'customer',
+                                'prefix_eng' => $student['student_prefix_eng'],
+                                'fname_eng' => $student['student_firstname_eng'],
+                                'lname_eng' => $student['student_lastname_eng'],
+                                'learning_status' => $student['student_learning_status'],
+                                'nationality' => $national ?? 'TH',
                             ]);
                         } catch (\Throwable $th) {
                             echo "Create customer error: " . $th->getMessage() . "\n";
@@ -112,14 +142,25 @@ class FetchPOSDataToDatabase extends Command
                     }
 
                     try {
-                        $cus_course = $customer->course;
-                        if (count($cus_course ?? []) > 0) {
-                            if (!in_array($course->id, $cus_course)) {
-                                $cus_course[] = $course->id;
-                                $customer->course = json_encode($cus_course);
-                            }
+                        // $cus_course = $customer->course;
+                        // if (count($cus_course ?? []) > 0) {
+                        //     if (!in_array($course->id, $cus_course)) {
+                        //         $cus_course[] = $course->id;
+                        //         $customer->course = json_encode($cus_course);
+                        //     }
+                        // } else {
+                        //     $customer->course = json_encode([$course->id]);
+                        // }
+
+                        $user_has_course = User_has_course::where('user_id', $customer->id)->where('course_id', $course->id)->count();
+                        if (!$user_has_course) {
+                            User_has_course::create([
+                                'user_id' => $customer->id,
+                                'course_id' => $course->id
+                            ]);
+                            echo "Create User_has_course success!! \n";
                         } else {
-                            $customer->course = json_encode([$course->id]);
+                            echo "User " . $customer->id . "and course " . $course->id . " has exist \n";
                         }
 
                         if (!$customer->hasRole('customer')) {
@@ -131,7 +172,7 @@ class FetchPOSDataToDatabase extends Command
                         echo "Update customer error: " . $th->getMessage() . "\n";
                     }
 
-                    echo "customer: " . $customer->email . "\n";
+                    echo "customer: " . $customer->username . "\n";
                 }
             }
             echo "Update data success!! \n";

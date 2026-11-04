@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ config('app.name') }} - Authorization</title>
-    <link rel="icon" type="image/x-icon" href="/imgs/logo.png">
+    <link rel="icon" type="image/x-icon" href="/imgs/smarthubtz_logo.png">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -58,7 +58,7 @@
                     <div class="card shadow w-md-25">
                         <div class="card-body">
                             <div class="text-center py-2">
-                                <img src="/imgs/logo.png" width="100" alt="">
+                                <img src="/imgs/smarthubtz_logo.png" width="100" alt="">
                                 <h1 class="m-0 fw-bold">Smart <span style="color: #F15A29">HUB</span></h1>
                                 <p><span class="fw-bold" style="color: #F15A29">Training</span>zenter</p>
                             </div>
@@ -78,7 +78,10 @@
                                             </div>
                                             <div class="">
                                                 <h5 class="mb-0">{{ auth()->user()->name }}</h5>
-                                                <p class="mb-0" style="max-width: 200px;">สาขา: {{ auth()->user()->getBrn ? auth()->user()->getBrn->name : auth()->user()->brn }}</p>
+                                                @php
+                                                    $brn = App\Models\Branch::where('brn_id', auth()->user()->brn)->first();
+                                                @endphp
+                                                <p class="mb-0" style="max-width: 200px;">สาขา: {{ $brn->name }}</p>
                                             </div>
                                         </div>
                                     </button>

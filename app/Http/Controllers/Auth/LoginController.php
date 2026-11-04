@@ -36,4 +36,13 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    /**
+     * The login form posts `username` (national ID / passport number); the column was renamed from `email`.
+     * laravel/ui defaults to `email`, which made the form fail validation silently.
+     */
+    public function username()
+    {
+        return 'username';
+    }
 }

@@ -3,7 +3,7 @@
     <p class="fw-bold">User Information</p>
     <div class="row row-cols-2 mb-4">
         <p class="mb-0">Name: <span class="text-decoration-underline ms-2">{{ $user->name }}</span></p>
-        <p class="mb-0">Username: <span class="text-decoration-underline ms-2">{{ $user->email }}</span></p>
+        <p class="mb-0">Username: <span class="text-decoration-underline ms-2">{{ $user->username }}</span></p>
         <p class="mb-0">Dpm: <span class="text-decoration-underline ms-2">{{ optional($user->getDpm)->name }}</span></p>
         <p class="mb-0">Dpm: <span class="text-decoration-underline ms-2">{{ optional($user->getBrn)->name }}</span></p>
         <p class="mb-0">Dpm: <span class="text-decoration-underline ms-2">{{ optional($user->getAgn)->name }}</span></p>

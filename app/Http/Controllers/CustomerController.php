@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Models\User as Customer;
+use App\Models\User_has_course;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,28 +35,28 @@ class CustomerController extends Controller
 
     public function storeCustomer(Request $request) {
         $request->validate([
-            'citizen_id' => 'required|unique:users,email|max:255',
+            'citizen_id' => 'required|unique:users,username|max:255',
             'name' => 'required|max:255',
             'pass' => 'required|max:13|min:8',
-            'course' => 'required',
         ], [
             'citizen_id.max' => 'Citizen ID must be 1-13 character.',
             'pass.max' => 'Password must be 8-13 character.',
             'pass.min' => 'Password must be 8-13 character.',
         ]);
         $cust = Customer::create([
-            'email' => $request->citizen_id,
+            'username' => $request->citizen_id,
             'password' => Hash::make($request->pass),
+            'prefix' => $request->prefix,
             'name' => $request->name,
+            'lname' => $request->lname,
             'gender' => $request->gend,
             'address' => $request->addr,
             'province' => $request->prov,
             'dob' => $request->dob,
             'phone' => $request->phone,
-            'course' => json_encode([$request->course]),
             'staff' => $request->user()->id,
-            'brn' => $request->user()->getBrn->name,
-            'agn' => $request->user()->getAgn->name,
+            'brn' => $request->user()->brn,
+            'agn' => $request->user()->agn,
             'role' => 'customer'
         ]);
 
@@ -72,24 +73,16 @@ class CustomerController extends Controller
 
         $cust = Customer::find($request->oid);
         $cust->update([
-            'email' => $request->id,
+            'username' => $request->id,
+            'prefix' => $request->prefix,
             'name' => $request->name,
+            'lname' => $request->lname,
             'gender' => $request->gend,
             'address' => $request->addr,
             'province' => $request->prov,
             'dob' => $request->dob,
             'phone' => $request->phone,
         ]);
-
-        $cus_course = $cust->course;
-        if (count($cus_course ?? []) > 0) {
-            if (!in_array($request->course, $cus_course)) {
-                $cus_course[] = $request->course;
-                $cust->course = json_encode($cus_course);
-            }
-        } else {
-            $cust->course = json_encode([$request->course]);
-        }
 
         if ($request->pass) {
             $request->validate([
@@ -117,7 +110,7 @@ class CustomerController extends Controller
             $datas = json_decode($request->data);
 
             foreach ($datas as $data) {
-                $cust = Customer::where('email', $data[7])->first();
+                $cust = Customer::where('username', $data[7])->first();
                 $course = Course::where('name', $data[4])->first();
                 if (!($course ?? false)) {
                     $course = Course::create([
@@ -135,7 +128,7 @@ class CustomerController extends Controller
                         "agn" => $request->user()->getAgn->name,
                         "phone" => $data[5],
                         "address" => $data[6],
-                        "email" => $data[7],
+                        "username" => $data[7],
                         "password" => Hash::make($data[7]),
                         'role' => 'customer'
                     ]);
@@ -177,5 +170,26 @@ class CustomerController extends Controller
     public function cleanCustomer() {
         Customer::onlyTrashed()->forceDelete();
         return response()->json(['message' => "Success"]);
+    }
+
+    public function addCourse(Request $request, $uid) {
+        try {
+            $user_has_course = User_has_course::where('user_id', $uid)->where('course_id', $request->courseSelect)->count();
+            if (!$user_has_course) {
+                User_has_course::create([
+                    'user_id' => $uid,
+                    'course_id' => $request->courseSelect
+                ]);
+            }
+            return back()->with('success', 'บันทึกข้อมูลสำเร็จ!');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return back()->withErrors($th->getMessage());
+        }
+    }
+
+    public function removeCourse($uid, $cid) {
+        User_has_course::where('user_id', $uid)->where('course_id', $cid)->delete();
+        return response()->json(['message' => $uid. ' ' . $cid]);
     }
 }

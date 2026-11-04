@@ -1,0 +1,79 @@
+{
+    "items": [
+        {
+            "type": "school",
+            "id": "11111111-1111-4111-8111-111111111111",
+            "school_id": "11111111-1111-4111-8111-111111111111",
+            "data": {
+                "slug": "demo-school",
+                "name": "โรงเรียนสอนขับรถตัวอย่าง",
+                "is_active": true,
+                "deleted": false
+            }
+        },
+        {
+            "type": "branch",
+            "id": "22222222-2222-4222-8222-222222222222",
+            "school_id": "11111111-1111-4111-8111-111111111111",
+            "data": {
+                "code": "KK",
+                "name": "สาขาตัวอย่าง",
+                "is_active": true,
+                "deleted": false
+            }
+        },
+        {
+            "type": "course",
+            "id": "33333333-3333-4333-8333-333333333399",
+            "school_id": "11111111-1111-4111-8111-111111111111",
+            "data": {
+                "code": "TR-01",
+                "name": "อบรมรถพ่วง",
+                "vehicle_type": {
+                    "code": "TRAILER",
+                    "name": "รถพ่วง"
+                },
+                "is_active": true,
+                "deleted": false
+            }
+        },
+        {
+            "type": "student",
+            "id": "a0000000-0000-4000-8000-000000000008",
+            "school_id": "11111111-1111-4111-8111-111111111111",
+            "data": {
+                "id_number": "1100000000088",
+                "title_prefix": "นาย",
+                "first_name": "รถพ่วง",
+                "last_name": "ไม่มีแมป",
+                "fullname_en": "Mr. Rotpuang Maimeemap",
+                "updated_at": "2026-11-04T09:15:00+07:00",
+                "enrollments": [
+                    {
+                        "id": "e0000000-0000-4000-8000-00000000000a",
+                        "status": "active",
+                        "enrolled_at": "2026-11-04T09:00:00+07:00",
+                        "completed_at": null,
+                        "cancelled_at": null,
+                        "branch": {
+                            "id": "22222222-2222-4222-8222-222222222222",
+                            "code": "KK",
+                            "name": "สาขาตัวอย่าง"
+                        },
+                        "course": {
+                            "id": "33333333-3333-4333-8333-333333333399",
+                            "code": "TR-01",
+                            "name": "อบรมรถพ่วง",
+                            "vehicle_type": {
+                                "code": "TRAILER",
+                                "name": "รถพ่วง"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "next_cursor": "104",
+    "has_more": false
+}

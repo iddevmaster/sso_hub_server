@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Agency;
 use App\Models\Branch;
 use App\Models\Course;
+use App\Models\CourseType;
 use App\Models\Department;
 use App\Models\User;
+use App\Models\User_has_course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -39,21 +43,25 @@ class HomeController extends Controller
         }
 
         $user = auth()->user();
-        $courses_list = $user->course ?? [];
-        $course = Course::where('id', end($courses_list) ?? '')->first(['name']);
-        $courses_name = $course->name ?? '';
-        $user_branch = $user->brn ?? '';
-        // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
-        if (strpos($courses_name, "รถยนต์") !== false) {
-            $course_type = "car";
-        } elseif (strpos($courses_name, "จักรยานยนต์") !== false) {
-            $course_type = "motobike";
-        } elseif (strpos($courses_name, "บรรทุก") !== false) {
-            $course_type = "trailer";
+        $courseid = User_has_course::where('user_id', $user->id)->orderBy('created_at', 'desc')->first(['course_id']);
+        $course = Course::where('id', $courseid->course_id ?? '')->first();
+        if ($course->course_type ?? false) {
+            $course_list = CourseType::where('code', $course->course_type)->first();
+            // result of $courses_name is "อบรมรถยนต์ 5 ชม.เพื่อไปสอบที่ขนส่ง" how to find "รถยน" in $courses_name
+            if (strpos($course_list->name, "รถยนต์") !== false) {
+                $course_type = "car";
+            } elseif (strpos($course_list->name, "จักรยานยนต์") !== false) {
+                $course_type = "motobike";
+            } elseif (strpos($course_list->name, "บรรทุก") !== false) {
+                $course_type = "trailer";
+            } else {
+                $course_type = "car";
+            }
         } else {
             $course_type = "car";
         }
 
+        $user_branch = optional($user->getBrn)->name ?? '';
         if (strpos($user_branch, "พยัค") !== false) {
             $send_branch = "idmsPY";
         } elseif (strpos($user_branch, "สารคาม") !== false) {
@@ -108,8 +116,14 @@ class HomeController extends Controller
         $brns = Branch::all();
         $perms = Permission::all();
         $roles = Role::all();
+        $course_type = CourseType::all();
+        $roleUserCounts = DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->select('roles.name', DB::raw('count(*) as count'))
+            ->groupBy('roles.name')
+            ->pluck('count', 'name');
 
-        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses'));
+        return view('pages.data-table', compact('agns', 'brns', 'perms', 'roles', 'courses', 'course_type', 'roleUserCounts'));
     }
 
     public function permTable() {
@@ -119,7 +133,18 @@ class HomeController extends Controller
         return view('pages.perm-table', compact('users', 'perms', 'roles'));
     }
 
+    /**
+     * Staff may only manage courses through the data endpoints; every other
+     * data type (agency, branch, role, permission, course type) is admin only.
+     */
+    private function authorizeDataType($type): void {
+        if ($type !== 'course' && !Auth::user()->hasRole('admin')) {
+            abort(403);
+        }
+    }
+
     public function addData(Request $request) {
+        $this->authorizeDataType($request->addType);
         if ($request->addType === 'agn') {
             Agency::create([
                 'name' => $request->agnname,
@@ -130,6 +155,7 @@ class HomeController extends Controller
                 'code' => '',
                 'name' => $request->cname,
                 'agn' => $request->user()->agn,
+                'course_type' => $request->ctype,
             ]);
             $course->code = $request->user()->getAgn->prefix . $course->id . date("Y");
             $course->save();
@@ -142,11 +168,16 @@ class HomeController extends Controller
             Permission::create(['name' => $request->permName]);
         } elseif ($request->addType === 'role') {
             Role::create(['name' => $request->roleName]);
+        } elseif ($request->addType === 'ctype') {
+            $coursetype = CourseType::create(['name' => $request->typename, 'code' => '']);
+            $coursetype->code = date("Y") . sprintf("%04d", $coursetype->id);
+            $coursetype->save();
         }
         return response()->json(['message' => $request->all()]);
     }
 
     public function updateData(Request $request) {
+        $this->authorizeDataType($request->addType);
         if ($request->addType === 'agn') {
             Agency::find($request->eid)->update([
                 'name' => $request->agnname,
@@ -155,21 +186,29 @@ class HomeController extends Controller
         } elseif ($request->addType === 'course') {
             Course::find($request->eid)->update([
                 'name' => $request->cname,
+                'course_type' => $request->ctype,
             ]);
         } elseif ($request->addType === 'brn') {
             Branch::find($request->eid)->update([
                 'name' => $request->bName,
                 'agn' => $request->bAgn,
             ]);
+        } elseif ($request->addType === 'ctype') {
+            CourseType::find($request->eid)->update([
+                'name' => $request->typename,
+            ]);
         }
         return response()->json(['message' => $request->all()]);
     }
 
     public function deleteData(Request $request) {
+        $this->authorizeDataType($request->deltype);
         if ($request->deltype === 'agn') {
             Agency::find($request->delid)->delete();
         } elseif ($request->deltype === 'course') {
             Course::find($request->delid)->delete();
+        } elseif ($request->deltype === 'ctype') {
+            CourseType::find($request->delid)->delete();
         } elseif ($request->deltype === 'brn') {
             Branch::find($request->delid)->delete();
         } elseif ($request->deltype === 'perm') {
@@ -198,34 +237,44 @@ class HomeController extends Controller
     }
 
     public function storeUser(Request $request) {
-        $brn = Branch::find($request->brn);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->uname,
-            'password' => Hash::make($request->pass),
-            'brn' => $brn->id,
-            'agn' => optional($brn->getAgn)->id,
-            'role' => '',
-            'icon' => '',
-        ]);
+        try {
+            $brn = Branch::where('brn_id' ,$request->brn)->first();
+            $user = User::create([
+                'prefix' => $request->prefix,
+                'name' => $request->name,
+                'lname' => $request->lname,
+                'username' => $request->uname,
+                'password' => Hash::make($request->pass),
+                'brn' => $brn->brn_id,
+                'agn' => optional($brn->getAgn)->agn_id,
+                'role' => '',
+                'icon' => '',
+            ]);
 
-        if ($request->role) {
-            $user->assignRole($request->role);
-            $user->role = $request->role;
-            $user->save();
+            if ($request->role) {
+                $user->assignRole($request->role);
+                $user->role = $request->role;
+                $user->save();
+            }
+
+            return response()->json(['message' => optional($brn->getAgn)->agn_id]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            // response error message and status
+            return response()->json(['error' => $th->getMessage()], 500);
         }
-
-        return response()->json(['message' => $request->all()]);
     }
 
     public function updateUser(Request $request) {
-        $brn = Branch::find($request->brn);
+        $brn = Branch::where('brn_id' ,$request->brn)->first();
         $user = User::find($request->eid);
         $roles = Role::pluck('name');
+        $user->prefix = $request->prefix;
         $user->name = $request->name;
-        $user->email = $request->uname;
-        $user->brn = $brn->id;
-        $user->agn = optional($brn->getAgn)->id;
+        $user->lname = $request->lname;
+        $user->username = $request->uname;
+        $user->brn = $brn->brn_id;
+        $user->agn = optional($brn->getAgn)->agn_id;
 
         if ($request->pass) {
             $user->password = Hash::make($request->pass);
@@ -253,17 +302,34 @@ class HomeController extends Controller
         return response()->json(['message' => $request->all()]);
     }
 
-    public function customerTable() {
+    public function customerTable(Request $request) {
+        $search = $request->session()->get('search') ?? '';
         if (Auth::user()->hasRole('admin')) {
-            $customers = User::role('customer')->orderBy('id', 'desc')->get();
+            $customers = User::role('customer')->where(function ($query) use ($search) {
+                $query->where('username', 'LIKE', "%$search%")
+                      ->orWhere('name', 'LIKE', "%$search%")
+                      ->orWhere('lname', 'LIKE', "%$search%");
+            })->orderBy('id', 'desc')->paginate(10);
         } else {
-            $customers = User::role('customer')->where('brn', optional(Auth::user()->getBrn)->name)->orderBy('id', 'desc')->get();
+            $customers = User::role('customer')->where('brn', Auth::user()->brn)->where(function ($query) use ($search) {
+                $query->where('username', 'LIKE', "%$search%")
+                      ->orWhere('name', 'LIKE', "%$search%")
+                      ->orWhere('lname', 'LIKE', "%$search%");
+            })->orderBy('id', 'desc')->paginate(10);
         }
-        $courses = Course::orderBy('id', 'desc')->get();
-        return view('pages.customer-table', compact('customers', 'courses'));
+        $courses = Course::orderBy('id', 'desc')->get(['id', 'name']);
+
+        return view('pages.customer-table', compact('customers', 'courses', 'search'));
     }
 
     public function customerLogin() {
         return view('auth.customer-login');
+    }
+
+    public function customerSearch(Request $request) {
+        $search = $request->query('searchText');
+        $request->session()->put('search', $search);
+
+        return redirect()->route('customerTable');
     }
 }

@@ -13,5 +13,6 @@ class Agency extends Model
         'name',
         'icon',
         'prefix',
+        'agn_id'
     ];
 }

@@ -6,7 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/x-icon" href="/imgs/logo.png">
+    <link rel="icon" type="image/x-icon" href="/imgs/smarthubtz_logo.png">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -31,7 +31,7 @@
     <div id="app" >
         <nav class="navbar navbar-expand-md shadow-sm">
             <div class="container">
-                <img src="/imgs/logo.png" width="50" alt="">
+                <img src="/imgs/smarthubtz_logo.png" width="50" alt="">
                 <a class="navbar-brand mx-2" href="{{ url('/') }}">
                     <b>Smart HUB</b>
                 </a>
@@ -43,22 +43,22 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                            <a class="nav-link" href="/">หน้าหลัก</a>
                         </li>
                         @hasanyrole('admin|staff')
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('customerTable') }}">Customers</a>
+                                <a class="nav-link" href="{{ route('customerTable') }}">ข้อมูลนักเรียน</a>
                             </li>
                             {{-- <li class="nav-item">
                                 <a class="nav-link" href="{{ route('user.perm') }}">Permissions</a>
                             </li> --}}
                             @role('admin')
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('userTable') }}">Users</a>
+                                    <a class="nav-link" href="{{ route('userTable') }}">ข้อมูลผู้ใช้</a>
                                 </li>
                             @endrole
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('dataTable') }}">Data</a>
+                                <a class="nav-link" href="{{ route('dataTable') }}">ข้อมูลระบบ</a>
                             </li>
                         @endhasanyrole
                     </ul>
@@ -87,10 +87,15 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name ? Auth::user()->name : Auth::user()->full_name }}
+                                    {{ Auth::user()->name ? Auth::user()->name . " " . Auth::user()->lname : Auth::user()->full_name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @hasanyrole('admin|staff')
+                                        <a class="dropdown-item" href="/ssohub_User_Manual.pdf" target="_blank">
+                                            คู่มือการใช้งาน
+                                        </a>
+                                    @endhasanyrole
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                     document.getElementById('logout-form').submit();">

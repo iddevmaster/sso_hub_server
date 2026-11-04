@@ -20,8 +20,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'prefix',
         'name',
-        'email',
+        'lname',
+        'username',
         'password',
         'brn',
         'agn',
@@ -35,6 +37,10 @@ class User extends Authenticatable
         'phone',
         'course',
         'life_time',
+        'prefix_eng',
+        'fname_eng',
+        'lname_eng',
+        'learning_status',
     ];
 
     public function getCourseAttribute($value)
@@ -42,10 +48,10 @@ class User extends Authenticatable
         return json_decode($value, true);
     }
     public function getBrn() {
-        return $this->belongsTo(Branch::class, 'brn');
+        return $this->belongsTo(Branch::class, 'brn', 'brn_id');
     }
     public function getAgn() {
-        return $this->belongsTo(Agency::class, 'agn');
+        return $this->belongsTo(Agency::class, 'agn', 'agn_id');
     }
 
     /**

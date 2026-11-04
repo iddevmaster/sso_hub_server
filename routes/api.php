@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Agency;
+use App\Models\Branch;
 use App\Models\Course;
+use App\Models\CourseType;
+use App\Models\User_has_course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -17,17 +21,59 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api', 'scope:view-user')->get('/user', function (Request $request) {
-    $courses_list = $request->user()->course ?? [];
-    $course = App\Models\Course::where('id', end($courses_list))->first(['code', 'name']);
+    $agn = Agency::where('agn_id', $request->user()->agn)->first(['name', 'agn_id']);
+    $brn = Branch::where('brn_id', $request->user()->brn)->first(['name', 'brn_id']);
+    // $courses = App\Models\Course::whereIn('id', $courses_list)->get(['code', 'name']);
+
+    if ($request->user()->role !== 'staff') {
+        $courses_list = User_has_course::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get(['course_id']);
+        $courses = DB::table('courses')
+                    ->join('course_types', 'courses.course_type', '=', 'course_types.code')
+                    ->select('courses.course_type', 'course_types.name')
+                    ->where('courses.id', optional($courses_list->first())->course_id)
+                    ->get();
+        // ต่างชาติ (เลขบัตรไม่ใช่ 13 หลัก) ของคอร์สที่มาจาก DTMS: ใช้ประเภทคอร์สต่างชาติตามประเภทรถ
+        $firstCourse = $courses_list->first();
+        if ($firstCourse && \App\Integrations\Dtms\IdNumber::isForeign((string) $request->user()->username)) {
+            $vehicle = Course::where('id', $firstCourse->course_id)->value('dtms_vehicle_type_code');
+            if ($vehicle) {
+                $foreignType = DB::table('dtms_course_type_map')
+                    ->join('course_types', 'dtms_course_type_map.course_type', '=', 'course_types.code')
+                    ->where('dtms_course_type_map.vehicle_type_code', $vehicle)
+                    ->where('dtms_course_type_map.is_foreign', true)
+                    ->select('course_types.code as course_type', 'course_types.name')
+                    ->first();
+                if ($foreignType) {
+                    $courses = collect([$foreignType]);
+                }
+            }
+        }
+        // if ($request->user()->nationality == 'TH') {
+        //     $courses = DB::table('courses')
+        //             ->join('course_types', 'courses.course_type', '=', 'course_types.code')
+        //             ->select('courses.course_type', 'course_types.name')
+        //             ->where('courses.id', $courses_list[0]->course_id)
+        //             ->get();
+        // } else {
+        //     $courseType = CourseType::where('code', "20240010")->get(['code', 'name']);
+        //     $courses = [
+        //         [
+        //             "course_type" => $courseType[0]->code,
+        //             "name" => $courseType[0]->name,
+        //         ]
+
+        //     ];
+        // }
+    }
     $user_data = [
-        "name" => $request->user()->name,
-        "username" => $request->user()->email,
+        "name" => ($request->user()->prefix ? $request->user()->prefix . ' ' : '') . $request->user()->name . ( $request->user()->lname ? (' ' . $request->user()->lname) : ''),
+        "username" => $request->user()->username,
         "role" => $request->user()->role,
-        "course_code" => $course->code,
-        "course_name" => $course->name,
-        "branch" => $request->user()->brn,
-        "agency" => $request->user()->agn,
+        "courses" => $courses ?? [],
+        "branch" => $brn ?? [],
+        "agency" => $agn ?? [],
     ];
+
     return $user_data;
 });
 
@@ -74,3 +120,7 @@ Route::middleware('auth.basic')->get('/courses', function () {
     return $res;
 });
 
+Route::withoutMiddleware('auth.basic')->get('/courseType', function () {
+    $courses = CourseType::get(['code', 'name']);
+    return $courses;
+});

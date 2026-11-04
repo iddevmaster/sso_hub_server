@@ -14,5 +14,11 @@ class Course extends Model
         'name',
         'from',
         'agn',
+        'course_type',
     ];
+
+    public function getTypeName() {
+        $course_type = CourseType::where('code', $this->course_type)->first();
+        return $course_type;
+    }
 }
