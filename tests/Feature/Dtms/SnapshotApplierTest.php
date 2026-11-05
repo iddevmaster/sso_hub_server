@@ -187,6 +187,19 @@ class SnapshotApplierTest extends TestCase
         $this->assertSame('CAR', Course::where('code', 'CAR-01')->value('dtms_vehicle_type_code'));
     }
 
+    public function test_id_number_with_trailing_spaces_is_trimmed_for_username_and_password(): void
+    {
+        $item = $this->student('09-foreign-student');
+        $item['data']['id_number'] = 'AB1234567    ';
+
+        $this->applier->apply($item);
+
+        $u = User::where('username', 'AB1234567')->first();
+        $this->assertSame('AB1234567', $u->getRawOriginal('username'));
+        $this->assertTrue(Hash::check('AB1234567', $u->password));
+        $this->assertSame('EN', $u->nationality);
+    }
+
     public function test_substituted_student_item_set(): void
     {
         $r = $this->applyAll('06-substituted-student');

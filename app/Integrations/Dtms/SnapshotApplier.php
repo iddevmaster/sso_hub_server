@@ -170,7 +170,9 @@ class SnapshotApplier implements ItemApplier
     private function applyStudent(array $item): ApplyResult
     {
         $data = $item['data'] ?? [];
-        $idNumber = (string) ($data['id_number'] ?? '');
+        // DTMS อาจส่ง id_number มาพร้อมช่องว่างท้าย (เช่น CHAR ที่เติมช่องว่าง) ต้องตัดก่อน ไม่เช่นนั้น
+        // รหัสผ่านเริ่มต้นจะมีช่องว่างติดไปด้วย แต่หน้า login ตัดช่องว่างทิ้ง (TrimStrings) จึงเข้าไม่ได้
+        $idNumber = trim((string) ($data['id_number'] ?? ''));
         if ($idNumber === '') {
             throw new SnapshotRuleViolation('student id_number missing');
         }
