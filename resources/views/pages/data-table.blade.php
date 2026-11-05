@@ -42,6 +42,10 @@
                                                     $from = 'POS';
                                                     break;
 
+                                                case 4:
+                                                    $from = 'DTMS';
+                                                    break;
+
                                                 default:
                                                     $from = '-unknown-';
                                                     break;

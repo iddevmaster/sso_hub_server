@@ -83,7 +83,7 @@ SSO จึงเก็บตาราง map ของตัวเอง (`dtms_
 |---|---|
 | school | ตรวจว่าเป็นโรงเรียนที่ตั้งไว้ใน env แล้วใช้ agency `IDD0002` ตัวเดิม ไม่เขียนทับชื่อ |
 | branch | บันทึก/อัปเดตใน `dtms_branch_map` เท่านั้น **ไม่แตะตาราง `branches`** (ห้ามเขียนทับชื่อ เพราะ `HomeController::index` ยังจับคู่ด้วยชื่อภาษาไทย) สาขาของนักเรียนได้จาก `dtms_branch_map.brn_id` ถ้ายังว่างให้ลง `dtms_sync_failures` |
-| course | หาจาก `dtms_id` ถ้าไม่พบให้สร้างใหม่ (`code`, `name`, `agn = IDD0002`) แล้วตั้ง `course_type` จาก `dtms_course_type_map` ห้ามใช้ `update:coursetype` ที่เดาจากชื่อ |
+| course | หาจาก `dtms_id` ถ้าไม่พบให้สร้างใหม่ (`code`, `name`, `agn = IDD0002`, `from = 4` แสดงในหน้าหลักสูตรว่า DTMS; 1 = SSO, 2 = EM, 3 = POS) แล้วตั้ง `course_type` จาก `dtms_course_type_map` ห้ามใช้ `update:coursetype` ที่เดาจากชื่อ |
 | student | หาจาก `dtms_student_id` แล้วตามด้วย `username = id_number` **รวมบัญชีที่ถูก soft delete** ถ้าเจอบัญชีที่ถูกลบให้ restore ถ้าไม่เจอให้สร้างใหม่ ด้วยรหัสผ่านเริ่มต้น = เลขบัตรเหมือนเดิม และให้ทั้ง `role = customer` กับ Spatie role `customer` ถ้ามีอยู่แล้ว**ให้อัปเดต**ชื่อไทย/อังกฤษและสาขาตามการลงทะเบียนล่าสุด แต่ไม่แตะรหัสผ่าน |
 | enrollment `active` / `pending_cancellation` / `completed` | สร้างหรือ restore แถว `user_has_courses` (จับคู่ด้วย `dtms_enrollment_id`) ให้ `created_at` = `enrolled_at` เพราะ `/api/user` เลือกคอร์สล่าสุดจาก `created_at` |
 | enrollment `cancelled` | soft delete แถว `user_has_courses` นั้น |

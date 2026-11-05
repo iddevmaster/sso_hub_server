@@ -147,7 +147,7 @@ class SnapshotApplier implements ItemApplier
                 'dtms_id' => $c['id'],
                 'code' => $c['code'] ?? null,
                 'name' => $c['name'] ?? null,
-                'from' => 2,
+                'from' => 4, // 4 = DTMS (1 = SSO, 2 = EM, 3 = POS)
                 'agn' => $this->agencyId(),
                 'course_type' => $type,
                 'dtms_vehicle_type_code' => $vehicle,
