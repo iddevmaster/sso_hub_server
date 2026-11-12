@@ -21,7 +21,8 @@
 | [08-known-issues.md](08-known-issues.md) | ปัญหาที่พบจากการอ่านโค้ด (ความปลอดภัย, ข้อมูล, โค้ดค้าง) | ก่อนแก้ไข / ปรับปรุงระบบ |
 | [09-dtms-sync-design.md](09-dtms-sync-design.md) | ร่างการออกแบบซิงก์ข้อมูลจาก DTMS (แทน EM) | วางแผน / พัฒนาการซิงก์ |
 | [10-dtms-sync-contract.md](10-dtms-sync-contract.md) | ร่างสัญญา API ระหว่าง DTMS กับ SSO | พัฒนาฝั่ง DTMS หรือ SSO |
-| [11-new-sso-design.md](11-new-sso-design.md) | ร่างการออกแบบ SSO ใหม่แบบหลายโรงเรียน และแผนย้ายจากระบบเดิม | วางแผนยกเครื่องระบบ |
+| [11-new-sso-design.md](11-new-sso-design.md) | ร่างการออกแบบ SSO ใหม่แบบหลายโรงเรียน และแผนย้ายจากระบบเดิม (**ถูกแทนที่ด้วยสเปกด้านล่าง** เก็บไว้เป็นประวัติ) | ดูประวัติการออกแบบ |
+| [superpowers/specs/2026-11-12-subscription-sso-design.md](superpowers/specs/2026-11-12-subscription-sso-design.md) | **สเปกฉบับล่าสุด:** SSO ใหม่สำหรับ DTMS Subscription (แพ็กเกจ starter/pro, SmartHub, Check-Before) | พัฒนา SSO ใหม่ / ทีม DTMS Subscription / ทีม SmartHub |
 | [12-kst-hub-sso-notes.md](12-kst-hub-sso-notes.md) | สิ่งที่ KST Hub ใช้จาก SSO และข้อเสนอที่ควรแก้ (อ่านอย่างเดียว ไม่ได้แก้ KST Hub) | แก้ KST Hub / ออกแบบ `/api/user` |
 | [13-phase1-legacy-dtms-bridge.md](13-phase1-legacy-dtms-bridge.md) | Phase 1: ต่อ SSO เดิมเข้ากับ DTMS ของ IDDrives ก่อนทำ SSO ใหม่ | **งานถัดไป** เริ่มอ่านที่นี่ |
 | [14-deploy-phase1.md](14-deploy-phase1.md) | ขั้นตอน deploy Phase 1 บนเซิร์ฟเวอร์ที่รันอยู่ พร้อมตรวจผลและ rollback | ก่อน deploy |
