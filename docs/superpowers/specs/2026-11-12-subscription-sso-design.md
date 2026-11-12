@@ -104,7 +104,8 @@ flowchart LR
 ### Portal (`/` หลัง login)
 
 - การ์ดบริการสร้างจาก `client_services` เฉพาะที่ `entitlement_key` อยู่ใน `entitlements` ของโรงเรียนผู้ใช้ และ `is_launchable` เพิ่มบริการใหม่ = เพิ่มแถว ไม่ต้องแก้โค้ด
-- v1: SmartHub เปิดใช้งาน Check-Before มีแถวแต่ `is_launchable = false`
+- v1: SmartHub เปิดใช้งาน Check-Before มีแถวแต่ `is_launchable = false` การ์ดที่ `is_launchable = false` แสดงเป็นการ์ดสีจางกดไม่ได้ พร้อมป้าย **"เร็วๆ นี้"** เฉพาะโรงเรียนที่มีสิทธิ์ `check_before` (`pro` และช่วงทดลองใช้) โรงเรียน `starter` ไม่เห็นการ์ดนี้เลย เมื่อ Check-Before ตัวใหม่เสร็จ แค่ตั้ง `is_launchable = true` และใส่ `launch_url`
+- ที่อยู่ของ SSO เองไม่เขียนตายในโค้ดหรือ view: ใช้ `APP_URL` จาก `.env` ทั้งหมด (ลิงก์ในอีเมล/redirect/asset) ส่วน redirect URI ของแต่ละ client อยู่ในฐานข้อมูล แก้ได้จากหน้าแอดมิน จึงเปลี่ยนโดเมนทีหลังได้โดยไม่ต้องแก้โค้ด
 - เมนูผู้ใช้: เปลี่ยนรหัสผ่าน, ออกจากระบบ
 
 ### การเข้าระบบปลายทาง
@@ -191,9 +192,11 @@ flowchart LR
 ส่งให้ทีม DTMS (ต่อยอดจาก [docs/tasks/dtms-phase1-sso-feed.md](../../tasks/dtms-phase1-sso-feed.md)):
 
 1. พอร์ต feed จาก branch `iddriver`: route, token, `changes.ts`, snapshot rules, trigger, cron ล้าง event, `sso-reemit` ระวังเลข migration และ **เลข ADR 0028 ที่ชนกัน** (คนละเรื่องในสอง repo)
-2. item `school` เพิ่ม `entitlements: string[]` คำนวณจากแผนปัจจุบันของโรงเรียน (ฟังก์ชันเดียวกับที่ใช้กับ `hasEntitlement`) **`cancelled` ส่ง `[]`** · `suspended` ส่งตามแผน
+2. item `school` เพิ่ม `entitlements: string[]` คำนวณด้วย `resolveEntitlements(status, currentPlanCode, planFeatures)` ใน `lib/billing/subscription-context.ts` ที่มีอยู่แล้ว (ช่วง `trialing` ได้สิทธิ์ของ `pro` ตามที่ DTMS ทำอยู่) **`cancelled` ส่ง `[]`** · `suspended` ส่งตามแผน ให้ใช้ **สถานะที่เก็บไว้ในฐานข้อมูล** ไม่ใช่สถานะที่คำนวณจากวันที่ตอน request เพื่อให้ค่าใน feed เปลี่ยนพร้อมกับการเขียนที่สร้าง event เท่านั้น (job รายวันเป็นตัวเขียนการเปลี่ยนสถานะตามเวลา)
 3. สร้าง event ให้ `school` เมื่อ `subscriptions`, `subscription_periods` หรือ `plan_features` เปลี่ยน (แก้ `plan_features` ต้อง fan-out ไปทุกโรงเรียนในแผนนั้น)
 4. เพิ่ม `plan_features`: `sso.smarthub` ให้ทั้งสองแผน, `sso.check_before` ให้ `pro` feed ส่งเฉพาะคีย์ขึ้นต้น `sso.` (ตัดคำนำหน้าออก) เพื่อไม่เปิดเผยคีย์โมดูลภายใน
+   - **ตรวจแล้ว (โค้ด `dtms-subscription`):** หน้า Super Admin แก้แผน ([app/admin/plans](D:/WebApp/DTMS/dtms-subscription/app/admin/plans)) สร้างช่องติ๊กจากค่าคงที่ `FEATURE_KEYS` ใน `lib/billing/plan-catalogue.ts` เท่านั้น และตอนบันทึกจะลบ/เพิ่มเฉพาะคีย์ใน `FEATURE_KEYS` ดังนั้นแถว `sso.*` ที่ seed ไว้ **ไม่โผล่บนหน้าจอและแก้เองไม่ได้** แต่จะไม่ถูกลบเมื่อบันทึกแผน
+   - ถ้าต้องการให้ Super Admin ติ๊กได้เอง ให้เพิ่มสองรายการ (`sso.smarthub`, `sso.check_before`) เข้า `FEATURE_KEYS` ที่เดียว `FEATURE_KEYS` ใช้เฉพาะหน้าแก้แผน ส่วน `GATED_FEATURE_KEYS` (ป้าย Pro และ test ที่ล็อกรายการหกโมดูล) เป็นอีกค่าคงที่ จึงไม่ต้องแก้ ให้ทีม DTMS ยืนยันอีกครั้งตอนทำ
 5. อินสแตนซ์ Subscription ใช้ `SSO_SYNC_TOKEN` ของตัวเอง และ `SSO_SYNC_SCHOOL_SCOPE=*`
 6. เพิ่ม fixture: `entitlements` ปกติ, `cancelled` = `[]`, เปลี่ยนแผน
 
@@ -207,7 +210,8 @@ flowchart LR
 4. ตั้งรหัสผ่านสุ่มให้บัญชีจาก SSO (K2) และตรวจ `state` (K3)
 5. เพิ่ม OAuth provider ที่สองและเส้นทาง `/sso/subscription/login` แยกจากเดิม ค่า client id/secret/host อ่านจาก env ชุดที่สอง
 6. หน้ากรองสาขา: เรียก roster endpoint ข้อ 6 แล้วกรองรายชื่อผู้ใช้ด้วยเลขบัตร
-7. SSO ใหม่ไม่ส่ง `role = staff` ใน v1 จึงยังไม่ต้องแก้ปัญหาบัญชีร่วม `iddriverstaff` (K4) ในรอบนี้ แต่ต้องแก้ก่อนเปิดขั้น staff
+7. **`/api/courseType`:** SmartHub เรียก `/api/courseType` ของ SSO เดิมจากคำสั่ง `php artisan update:coursegroup` ([UpdateCourseGroup.php](D:/WebApp/kst_hub/app/Console/Commands/UpdateCourseGroup.php)) เพื่อสร้าง `course_group` ภายใต้ agency `IDD0002` ของ IDDrives (ตายตัวในโค้ด) ไม่พบการตั้งเวลาใน `Kernel.php` (ไม่ทราบว่ามี cron ภายนอกหรือไม่) SSO ใหม่ **ไม่ต้องทำ `/api/courseType`** เพราะ `course_group` ของโรงเรียนใน Subscription ถูกสร้างตอน login จาก `courses[0]` อยู่แล้ว และคำสั่งนี้ต้องคงชี้ไปที่ host ของ SSO เดิม (`auth.sso_host`) ห้ามสลับไปชี้ SSO ใหม่เมื่อเพิ่ม provider ตัวที่สอง
+8. SSO ใหม่ไม่ส่ง `role = staff` ใน v1 จึงยังไม่ต้องแก้ปัญหาบัญชีร่วม `iddriverstaff` (K4) ในรอบนี้ แต่ต้องแก้ก่อนเปิดขั้น staff
 
 ## 10. ลำดับการทำ
 
@@ -248,11 +252,14 @@ PHPUnit บนฐานข้อมูลทดสอบแยก (ไม่ใ�
 - login เจ้าหน้าที่/ครูฝึก (ผ่านการตรวจรหัสผ่านกับ DTMS ในอนาคต) และการให้แอดมิน SSO login ผ่าน DTMS
 - ลืมรหัสผ่านทางอีเมล: ตอนนี้รีเซ็ตโดยแอดมิน SSO เท่านั้น
 
-ต้องตรวจ/ตัดสินใจระหว่างทำ:
-- หน้าจอ Super Admin ของ DTMS อาจไม่แสดงคีย์ `sso.*` ใหม่ → ตรวจในขั้น 1
-- ไม่ทราบว่ามีระบบใดเรียก `/api/courseType` (สาธารณะ) ของ SSO เดิม → ถามเจ้าของระบบก่อนปิดบริการเดิม (ไม่เกี่ยวกับ SSO ใหม่)
-- โดเมนของ SSO ใหม่ → ตัดสินใจก่อนขั้น 3 (กระทบ redirect URI ของ client)
-- การ์ด Check-Before ของโรงเรียน `pro` ระหว่างที่ตัวใหม่ยังไม่เสร็จ: แสดง "เร็วๆ นี้" หรือซ่อน → ตัดสินใจตอนทำ UI portal
+ตัดสินใจแล้วระหว่างทบทวนสเปก (2026-11-12):
+- **โดเมนของ SSO ใหม่:** ยังไม่ระบุ ใช้ `APP_URL` เป็นตัวแปร และ redirect URI ของ client เก็บในฐานข้อมูล (ข้อ 5) staging ใช้โดเมนชั่วคราวได้ ต้องกำหนดก่อนนำร่องจริง (ขั้น 5)
+- **การ์ด Check-Before ของโรงเรียน `pro`:** แสดงเป็น "เร็วๆ นี้" (ข้อ 5)
+- **หน้าจอ Super Admin ของ DTMS ไม่แสดงคีย์ `sso.*` อัตโนมัติ:** ตรวจแล้ว ต้องเพิ่มใน `FEATURE_KEYS` ถ้าต้องการให้ติ๊กเองได้ (ข้อ 8)
+- **`/api/courseType`:** มีผู้เรียกเพียงคำสั่ง `update:coursegroup` ของ SmartHub ซึ่งผูกกับ IDDrives SSO ใหม่ไม่ต้องทำ (ข้อ 9)
+
+ต้องตรวจระหว่างทำ:
+- ไม่ทราบว่ามี cron ภายนอกเรียก `update:coursegroup` หรือไม่ ถามผู้ดูแลเซิร์ฟเวอร์ SmartHub ก่อนปิด SSO เดิมในอนาคต (ไม่กระทบสเปกนี้)
 - เวลา hash รหัสผ่านตอนนำเข้าครั้งแรกกับนักเรียนหลักหมื่น → วัดจริงในขั้น 4
 
 ## 14. ความต่างจากร่างเดิม (docs/11)
